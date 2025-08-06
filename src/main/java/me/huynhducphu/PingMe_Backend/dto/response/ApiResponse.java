@@ -12,16 +12,24 @@ import lombok.NoArgsConstructor;
 @Data
 public class ApiResponse<T> {
 
+    private String errorMessage;
     private String errorCode;
     private T data;
 
-    public ApiResponse(String errorCode) {
+    public ApiResponse(String errorMessage) {
+        this.errorMessage = errorMessage;
+        this.errorCode = null;
+        this.data = null;
+    }
+
+    public ApiResponse(String errorMessage, String errorCode) {
+        this.errorMessage = errorMessage;
         this.errorCode = errorCode;
         this.data = null;
     }
 
     public ApiResponse(T data) {
         this.data = data;
-        this.errorCode = null;
+        this.errorMessage = null;
     }
 }

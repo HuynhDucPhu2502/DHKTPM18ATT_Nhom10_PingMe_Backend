@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class DefaultAuthResponseDto {
 
-    private UserSession userSession;
+    private UserSessionResponseDto userSession;
     private String accessToken;
 
 }

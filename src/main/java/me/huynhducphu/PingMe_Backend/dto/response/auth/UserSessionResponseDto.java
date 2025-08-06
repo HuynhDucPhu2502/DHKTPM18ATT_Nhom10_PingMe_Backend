@@ -4,15 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 /**
  * Admin 8/3/2025
  **/
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class UserSession {
+public class UserSessionResponseDto {
 
     private String email;
     private String name;

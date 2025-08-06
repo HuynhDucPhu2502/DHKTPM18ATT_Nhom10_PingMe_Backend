@@ -35,7 +35,10 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
         objectMapper.writeValue(
                 response.getWriter(),
-                new ApiResponse<>("Token không hợp lệ (không đúng định dạng, hết thời gian...)")
+                new ApiResponse<>(
+                        "Token không hợp lệ (không đúng định dạng, hết thời gian...)",
+                        "INVALID_JWT_TOKEN"
+                )
         );
 
     }

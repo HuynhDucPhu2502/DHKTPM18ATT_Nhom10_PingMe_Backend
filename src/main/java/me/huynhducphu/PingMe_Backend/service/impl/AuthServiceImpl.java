@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import me.huynhducphu.PingMe_Backend.dto.request.auth.UserLoginRequestDto;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.AuthResultWrapper;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.DefaultAuthResponseDto;
-import me.huynhducphu.PingMe_Backend.dto.response.auth.UserSession;
+import me.huynhducphu.PingMe_Backend.dto.response.auth.UserSessionResponseDto;
 import me.huynhducphu.PingMe_Backend.model.User;
 import me.huynhducphu.PingMe_Backend.repository.UserRepository;
 import me.huynhducphu.PingMe_Backend.service.JwtService;
@@ -51,6 +51,17 @@ public class AuthServiceImpl implements me.huynhducphu.PingMe_Backend.service.Au
     }
 
     @Override
+    public ResponseCookie logout() {
+        return ResponseCookie
+                .from("refresh_token", null)
+                .httpOnly(true)
+                .path("/")
+                .sameSite("Strict")
+                .maxAge(0)
+                .build();
+    }
+
+    @Override
     public AuthResultWrapper refreshSession(String refreshToken) {
         String email = jwtService.decodeJwt(refreshToken).getSubject();
         var user = userRepository
@@ -72,12 +83,18 @@ public class AuthServiceImpl implements me.huynhducphu.PingMe_Backend.service.Au
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy người dùng hiện tại"));
     }
 
+    @Override
+    public UserSessionResponseDto getCurrentUserSession() {
+        var user = getCurrentUser();
+        return modelMapper.map(user, UserSessionResponseDto.class);
+    }
+
     private AuthResultWrapper buildAuthResultWrapper(User user) {
         var accessToken = jwtService.buildJwt(user, accessTokenExpiration);
         var refreshToken = jwtService.buildJwt(user, refreshTokenExpiration);
 
         var defaultAuthResponseDto = new DefaultAuthResponseDto(
-                modelMapper.map(user, UserSession.class),
+                modelMapper.map(user, UserSessionResponseDto.class),
                 accessToken
         );
         var refreshTokenCookie = ResponseCookie

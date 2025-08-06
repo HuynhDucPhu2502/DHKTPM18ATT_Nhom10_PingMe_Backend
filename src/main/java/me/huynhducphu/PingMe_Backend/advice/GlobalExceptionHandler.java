@@ -106,16 +106,11 @@ public class GlobalExceptionHandler {
                 .body(new ApiResponse<>("Tài khoản hoặc mật khẩu không hợp lệ"));
     }
 
-    @ExceptionHandler(value = {
-            BadJwtException.class,
-            AccessDeniedException.class
-    })
+    @ExceptionHandler(value = AccessDeniedException.class)
     public ResponseEntity<ApiResponse<Void>> handleAuthorizationException(Exception e) {
         log.error(e.getMessage(), e);
 
         String message = "Không có quyền truy cập";
-        if (e instanceof BadJwtException)
-            message = "Token không hợp lệ (không đúng định dạng, hết thời gian...)";
 
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
