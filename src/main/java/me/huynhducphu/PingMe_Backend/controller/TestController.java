@@ -16,6 +16,6 @@ public class TestController {
 
     @GetMapping("/public")
     public String publicTest() {
-        return "Hello world PUBLIC";
+        return "Hello world PUBLIC 2";
     }
 }
