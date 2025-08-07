@@ -1,4 +1,4 @@
-name: CI/CD Deploy to EC2
+name: CI/CD Deploy to Elastic Beanstalk
 
 on:
   push:
@@ -7,6 +7,7 @@ on:
 
 jobs:
   build:
+    name: Build & Push Docker Image
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
@@ -34,6 +35,7 @@ jobs:
         run: docker push ${{ secrets.DOCKER_USERNAME }}/pingme-backend:latest
 
   deploy:
+    name: Deploy to Elastic Beanstalk
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -50,7 +52,7 @@ jobs:
             },
             "Ports": [
               {
-                "ContainerPort": "8080"
+                "ContainerPort": 8080
               }
             ]
           }' > Dockerrun.aws.json
@@ -68,4 +70,3 @@ jobs:
           version_label: v-${{ github.run_number }}
           region: us-east-1
           deployment_package: deploy.zip
-
