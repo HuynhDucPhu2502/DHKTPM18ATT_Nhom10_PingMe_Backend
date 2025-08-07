@@ -44,18 +44,20 @@ jobs:
 
       - name: Generate Dockerrun.aws.json
         run: |
-          echo '{
-            "AWSEBDockerrunVersion": 1,
+          cat > Dockerrun.aws.json <<EOF
+          {
+            "AWSEBDockerrunVersion": "1",
             "Image": {
               "Name": "${{ secrets.DOCKER_USERNAME }}/pingme-backend:latest",
               "Update": "true"
             },
             "Ports": [
               {
-                "ContainerPort": 8080
+                "ContainerPort": "8080"
               }
             ]
-          }' > Dockerrun.aws.json
+          }
+          EOF
 
       - name: Zip Dockerrun.aws.json
         run: zip -r deploy.zip Dockerrun.aws.json
@@ -70,3 +72,4 @@ jobs:
           version_label: v-${{ github.run_number }}
           region: us-east-1
           deployment_package: deploy.zip
+
