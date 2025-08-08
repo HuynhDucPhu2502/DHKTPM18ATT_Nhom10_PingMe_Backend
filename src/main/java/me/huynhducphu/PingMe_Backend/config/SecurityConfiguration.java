@@ -44,8 +44,9 @@ public class SecurityConfiguration {
     ) throws Exception {
         httpSecurity
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(WHITELIST).permitAll()
-                        .anyRequest().authenticated()
+//                        .requestMatchers(WHITELIST).permitAll()
+//                        .anyRequest().authenticated()
+                                .anyRequest().permitAll()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(Customizer.withDefaults())
