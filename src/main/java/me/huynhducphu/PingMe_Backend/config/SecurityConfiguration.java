@@ -27,7 +27,10 @@ public class SecurityConfiguration {
             "/auth/logout",
             "/auth/register",
             "/auth/refresh",
-            "/users"
+            "/users",
+
+            // HEALTH CHECK
+            "/actuator/health"
     };
 
     @Value("${app.cors.allowed-origins}")
