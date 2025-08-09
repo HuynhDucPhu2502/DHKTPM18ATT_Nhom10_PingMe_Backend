@@ -40,7 +40,8 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity httpSecurity,
-            CustomAuthenticationEntryPoint customAuthenticationEntryPoint
+            CustomAuthenticationEntryPoint customAuthenticationEntryPoint,
+            SkipPathBearerTokenResolver skipPathBearerTokenResolver
     ) throws Exception {
         httpSecurity
                 .authorizeHttpRequests(auth -> auth
@@ -50,6 +51,7 @@ public class SecurityConfiguration {
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(Customizer.withDefaults())
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
+                        .bearerTokenResolver(skipPathBearerTokenResolver)
                 )
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)

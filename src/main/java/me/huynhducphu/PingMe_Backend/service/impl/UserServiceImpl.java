@@ -30,7 +30,6 @@ public class UserServiceImpl implements me.huynhducphu.PingMe_Backend.service.Us
         if (userRepository.existsByEmail(createUserRequestDto.getEmail()))
             throw new DataIntegrityViolationException("Email đã tồn tại");
 
-
         var user = modelMapper.map(createUserRequestDto, User.class);
         user.setAuthProvider(AuthProvider.LOCAL);
         user.setPassword(passwordEncoder.encode(user.getPassword()));

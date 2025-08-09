@@ -2,7 +2,8 @@ package me.huynhducphu.PingMe_Backend.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import me.huynhducphu.PingMe_Backend.dto.request.auth.UserLoginRequestDto;
+import me.huynhducphu.PingMe_Backend.dto.request.auth.UserLoginLocalRequestDto;
+import me.huynhducphu.PingMe_Backend.dto.request.auth.UserRegisterLocalRequestDto;
 import me.huynhducphu.PingMe_Backend.dto.response.ApiResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.DefaultAuthResponseDto;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.UserSessionResponseDto;
@@ -22,11 +23,20 @@ public class AuthController {
 
     private final AuthService authService;
 
+    @PostMapping("/register")
+    public ResponseEntity<ApiResponse<UserSessionResponseDto>> registerLocal(
+            @RequestBody @Valid UserRegisterLocalRequestDto userRegisterLocalRequestDto
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(new ApiResponse<>(authService.registerLocal(userRegisterLocalRequestDto)));
+    }
+
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<DefaultAuthResponseDto>> loginLocal(
-            @RequestBody @Valid UserLoginRequestDto userLoginRequestDto
+            @RequestBody @Valid UserLoginLocalRequestDto userLoginLocalRequestDto
     ) {
-        var authResultWrapper = authService.loginLocal(userLoginRequestDto);
+        var authResultWrapper = authService.loginLocal(userLoginLocalRequestDto);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

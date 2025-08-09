@@ -2,19 +2,23 @@ package me.huynhducphu.PingMe_Backend.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import me.huynhducphu.PingMe_Backend.dto.request.auth.UserLoginRequestDto;
+import me.huynhducphu.PingMe_Backend.dto.request.auth.UserLoginLocalRequestDto;
+import me.huynhducphu.PingMe_Backend.dto.request.auth.UserRegisterLocalRequestDto;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.AuthResultWrapper;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.DefaultAuthResponseDto;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.UserSessionResponseDto;
 import me.huynhducphu.PingMe_Backend.model.User;
+import me.huynhducphu.PingMe_Backend.model.constant.AuthProvider;
 import me.huynhducphu.PingMe_Backend.repository.UserRepository;
 import me.huynhducphu.PingMe_Backend.service.JwtService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,9 +31,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthServiceImpl implements me.huynhducphu.PingMe_Backend.service.AuthService {
 
     private final AuthenticationManager authenticationManager;
+    private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
-    private final UserRepository userRepository;
+
     private final ModelMapper modelMapper;
+
+    private final UserRepository userRepository;
 
     @Value("${jwt.access-token-expiration}")
     private Long accessTokenExpiration;
@@ -38,10 +45,25 @@ public class AuthServiceImpl implements me.huynhducphu.PingMe_Backend.service.Au
     private Long refreshTokenExpiration;
 
     @Override
-    public AuthResultWrapper loginLocal(UserLoginRequestDto userLoginRequestDto) {
+    public UserSessionResponseDto registerLocal(
+            UserRegisterLocalRequestDto userRegisterLocalRequestDto) {
+        var user = modelMapper.map(userRegisterLocalRequestDto, User.class);
+
+        if (userRepository.existsByEmail(userRegisterLocalRequestDto.getEmail()))
+            throw new DataIntegrityViolationException("Email đã tồn tại");
+
+        user.setAuthProvider(AuthProvider.LOCAL);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        var savedUser = userRepository.save(user);
+
+        return modelMapper.map(savedUser, UserSessionResponseDto.class);
+    }
+
+    @Override
+    public AuthResultWrapper loginLocal(UserLoginLocalRequestDto userLoginLocalRequestDto) {
         var authenticationToken = new UsernamePasswordAuthenticationToken(
-                userLoginRequestDto.getEmail(),
-                userLoginRequestDto.getPassword()
+                userLoginLocalRequestDto.getEmail(),
+                userLoginLocalRequestDto.getPassword()
         );
 
         var authentication = authenticationManager.authenticate(authenticationToken);
