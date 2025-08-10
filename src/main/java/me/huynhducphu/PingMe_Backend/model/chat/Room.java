@@ -1,0 +1,38 @@
+package me.huynhducphu.PingMe_Backend.model.chat;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import me.huynhducphu.PingMe_Backend.model.common.BaseEntity;
+import me.huynhducphu.PingMe_Backend.model.constant.RoomType;
+
+/**
+ * Admin 8/10/2025
+ **/
+@Entity
+@Table(name = "rooms")
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+public class Room extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
+    private Long id;
+
+    @Column(name = "room_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private RoomType roomType;
+    // DIRECT (1-1), GROUP (n-n)
+
+    @Column(name = "direct_key", unique = true)
+    private String directKey;
+    // ROOM KEY (Nếu chat n-n thì null)
+
+    private String name;
+    // ROOM NAME (nếu chat 1-1 thì NULL)
+
+}

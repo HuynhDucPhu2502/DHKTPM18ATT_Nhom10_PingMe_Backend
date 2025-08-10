@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import me.huynhducphu.PingMe_Backend.model.common.BaseEntity;
 import me.huynhducphu.PingMe_Backend.model.constant.AuthProvider;
 import me.huynhducphu.PingMe_Backend.model.constant.Gender;
 
