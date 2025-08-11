@@ -1,4 +1,4 @@
-package me.huynhducphu.PingMe_Backend.config;
+package me.huynhducphu.PingMe_Backend.config.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;

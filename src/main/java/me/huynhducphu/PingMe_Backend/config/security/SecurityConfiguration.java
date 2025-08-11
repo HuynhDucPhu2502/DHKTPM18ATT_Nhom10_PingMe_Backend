@@ -1,4 +1,4 @@
-package me.huynhducphu.PingMe_Backend.config;
+package me.huynhducphu.PingMe_Backend.config.security;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -22,14 +22,21 @@ import java.util.Arrays;
 public class SecurityConfiguration {
 
     private static final String[] WHITELIST = {
-            // LOGIN
+            // Authentication
             "/auth/login",
             "/auth/logout",
             "/auth/register",
             "/auth/refresh",
+
+            // WebSocket
+            // Bỏ qua kiểm tra tại lớp BearerTokenFilter
+            // Kiểm tra ở lại lớp HandShakeInterceptor
+            "/ws/**",
+
+            // User (chỉ dùng để test)
             "/users",
 
-            // HEALTH CHECK
+            // Health check
             "/actuator/health",
             "/actuator/health/**",
     };

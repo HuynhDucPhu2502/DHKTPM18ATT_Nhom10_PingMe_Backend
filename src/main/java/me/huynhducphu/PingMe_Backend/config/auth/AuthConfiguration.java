@@ -1,4 +1,4 @@
-package me.huynhducphu.PingMe_Backend.config;
+package me.huynhducphu.PingMe_Backend.config.auth;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.nimbusds.jose.util.Base64;

@@ -1,4 +1,4 @@
-package me.huynhducphu.PingMe_Backend.config;
+package me.huynhducphu.PingMe_Backend.config.security;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
