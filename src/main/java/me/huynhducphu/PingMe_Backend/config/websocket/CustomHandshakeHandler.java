@@ -24,7 +24,7 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class CustomHandshakeHandler extends DefaultHandshakeHandler {
-
+    
     private final AuthenticationManager wsAuthManager;
     private final JwtDecoder jwtDecoder;
 
