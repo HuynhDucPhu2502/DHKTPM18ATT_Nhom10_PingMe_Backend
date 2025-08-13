@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class DefaultAuthResponseDto {
+public class DefaultAuthResponse {
 
-    private UserSessionResponseDto userSession;
+    private UserSessionResponse userSession;
     private String accessToken;
 
 }
