@@ -13,7 +13,7 @@ import org.springframework.http.ResponseCookie;
 @Data
 public class AuthResultWrapper {
 
-    private DefaultAuthResponseDto defaultAuthResponseDto;
+    private DefaultAuthResponse defaultAuthResponse;
     private ResponseCookie refreshTokenCookie;
 
 }
