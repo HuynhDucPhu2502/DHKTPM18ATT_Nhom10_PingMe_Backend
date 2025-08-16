@@ -28,6 +28,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
+
 /**
  * Admin 8/3/2025
  **/
@@ -113,18 +115,6 @@ public class AuthServiceImpl implements me.huynhducphu.PingMe_Backend.service.Au
     }
 
     @Override
-    public User getCurrentUser() {
-        String email = SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getName();
-
-        return userRepository
-                .getUserByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy người dùng hiện tại"));
-    }
-
-    @Override
     public UserSessionResponse getCurrentUserSession() {
         var user = getCurrentUser();
         return modelMapper.map(user, UserSessionResponse.class);
@@ -179,8 +169,25 @@ public class AuthServiceImpl implements me.huynhducphu.PingMe_Backend.service.Au
         );
 
         user.setAvatarUrl(url);
+        user.setUpdatedAt(LocalDateTime.now());
 
         return modelMapper.map(user, UserSessionResponse.class);
+    }
+
+    // =====================================
+    // Ulities methods
+    // =====================================
+
+    @Override
+    public User getCurrentUser() {
+        String email = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        return userRepository
+                .getUserByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy người dùng hiện tại"));
     }
 
     private AuthResultWrapper buildAuthResultWrapper(User user) {
