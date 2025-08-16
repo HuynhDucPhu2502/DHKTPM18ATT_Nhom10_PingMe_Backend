@@ -1,6 +1,6 @@
 package me.huynhducphu.PingMe_Backend.service;
 
-import me.huynhducphu.PingMe_Backend.dto.request.auth.LoginRequest;
+import me.huynhducphu.PingMe_Backend.dto.request.auth.SessionMetaRequest;
 
 import java.time.Duration;
 
@@ -10,7 +10,7 @@ import java.time.Duration;
 public interface RefreshTokenRedisService {
     void saveRefreshToken(
             String token, String userId,
-            LoginRequest loginRequest, Duration expire
+            SessionMetaRequest sessionMetaRequest, Duration expire
     );
 
     boolean validateToken(String token, String userId);

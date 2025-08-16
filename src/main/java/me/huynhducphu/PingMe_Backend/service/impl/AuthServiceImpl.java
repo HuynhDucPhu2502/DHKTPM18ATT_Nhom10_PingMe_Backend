@@ -2,10 +2,7 @@ package me.huynhducphu.PingMe_Backend.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import me.huynhducphu.PingMe_Backend.dto.request.auth.ChangePasswordRequest;
-import me.huynhducphu.PingMe_Backend.dto.request.auth.ChangeProfileRequest;
-import me.huynhducphu.PingMe_Backend.dto.request.auth.LoginRequest;
-import me.huynhducphu.PingMe_Backend.dto.request.auth.RegisterRequest;
+import me.huynhducphu.PingMe_Backend.dto.request.auth.*;
 import me.huynhducphu.PingMe_Backend.dto.common.AuthResultWrapper;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.DefaultAuthResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.UserDetailResponse;
@@ -14,6 +11,7 @@ import me.huynhducphu.PingMe_Backend.model.User;
 import me.huynhducphu.PingMe_Backend.model.constant.AuthProvider;
 import me.huynhducphu.PingMe_Backend.repository.UserRepository;
 import me.huynhducphu.PingMe_Backend.service.JwtService;
+import me.huynhducphu.PingMe_Backend.service.RefreshTokenRedisService;
 import me.huynhducphu.PingMe_Backend.service.S3Service;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 /**
@@ -44,6 +43,7 @@ public class AuthServiceImpl implements me.huynhducphu.PingMe_Backend.service.Au
 
     private final JwtService jwtService;
     private final S3Service s3Service;
+    private final RefreshTokenRedisService refreshTokenRedisService;
 
     private final ModelMapper modelMapper;
 
@@ -89,7 +89,7 @@ public class AuthServiceImpl implements me.huynhducphu.PingMe_Backend.service.Au
         var authentication = authenticationManager.authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        return buildAuthResultWrapper(getCurrentUser());
+        return buildAuthResultWrapper(getCurrentUser(), loginRequest.getSessionMetaRequest());
     }
 
     @Override
@@ -105,13 +105,15 @@ public class AuthServiceImpl implements me.huynhducphu.PingMe_Backend.service.Au
     }
 
     @Override
-    public AuthResultWrapper refreshSession(String refreshToken) {
+    public AuthResultWrapper refreshSession(
+            String refreshToken, SessionMetaRequest sessionMetaRequest
+    ) {
         String email = jwtService.decodeJwt(refreshToken).getSubject();
         var user = userRepository
                 .getUserByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy người dùng"));
 
-        return buildAuthResultWrapper(user);
+        return buildAuthResultWrapper(user, sessionMetaRequest);
     }
 
     @Override
@@ -190,14 +192,30 @@ public class AuthServiceImpl implements me.huynhducphu.PingMe_Backend.service.Au
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy người dùng hiện tại"));
     }
 
-    private AuthResultWrapper buildAuthResultWrapper(User user) {
+    private AuthResultWrapper buildAuthResultWrapper(
+            User user,
+            SessionMetaRequest sessionMetaRequest
+    ) {
+        // ================================================
+        // HANDLE ACCESS TOKEN
+        // ================================================
         var accessToken = jwtService.buildJwt(user, accessTokenExpiration);
-        var refreshToken = jwtService.buildJwt(user, refreshTokenExpiration);
-
         var defaultAuthResponseDto = new DefaultAuthResponse(
                 modelMapper.map(user, UserSessionResponse.class),
                 accessToken
         );
+
+        // ================================================
+        // HANDLE REFRESH TOKEN
+        // ================================================
+        var refreshToken = jwtService.buildJwt(user, refreshTokenExpiration);
+        refreshTokenRedisService.saveRefreshToken(
+                refreshToken,
+                user.getId().toString(),
+                sessionMetaRequest,
+                Duration.ofSeconds(refreshTokenExpiration)
+        );
+
         var refreshTokenCookie = ResponseCookie
                 .from(REFRESH_TOKEN_COOKIE_NAME, refreshToken)
                 .httpOnly(true)

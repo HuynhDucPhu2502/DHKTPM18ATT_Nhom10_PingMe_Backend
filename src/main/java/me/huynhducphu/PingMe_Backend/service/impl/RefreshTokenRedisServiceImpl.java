@@ -2,6 +2,7 @@ package me.huynhducphu.PingMe_Backend.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import me.huynhducphu.PingMe_Backend.dto.request.auth.LoginRequest;
+import me.huynhducphu.PingMe_Backend.dto.request.auth.SessionMetaRequest;
 import me.huynhducphu.PingMe_Backend.model.common.SessionMeta;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -22,16 +23,16 @@ public class RefreshTokenRedisServiceImpl implements me.huynhducphu.PingMe_Backe
     @Override
     public void saveRefreshToken(
             String token, String userId,
-            LoginRequest loginRequest, Duration expire
+            SessionMetaRequest sessionMetaRequest, Duration expire
     ) {
         String sessionId = buildKey(token, userId);
 
         SessionMeta sessionMeta = new SessionMeta(
                 sessionId,
-                loginRequest.getDeviceType(),
-                loginRequest.getBrowser(),
-                loginRequest.getOs(),
-                Instant.now()
+                sessionMetaRequest.getDeviceType(),
+                sessionMetaRequest.getBrowser(),
+                sessionMetaRequest.getOs(),
+                Instant.now().toString()
         );
 
         redisSessionMetaTemplate.opsForValue().set(sessionId, sessionMeta, expire);

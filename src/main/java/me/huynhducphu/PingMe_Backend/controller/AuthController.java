@@ -2,10 +2,7 @@ package me.huynhducphu.PingMe_Backend.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import me.huynhducphu.PingMe_Backend.dto.request.auth.ChangePasswordRequest;
-import me.huynhducphu.PingMe_Backend.dto.request.auth.ChangeProfileRequest;
-import me.huynhducphu.PingMe_Backend.dto.request.auth.LoginRequest;
-import me.huynhducphu.PingMe_Backend.dto.request.auth.RegisterRequest;
+import me.huynhducphu.PingMe_Backend.dto.request.auth.*;
 import me.huynhducphu.PingMe_Backend.dto.response.ApiResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.DefaultAuthResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.UserDetailResponse;
@@ -58,9 +55,10 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<DefaultAuthResponse>> refreshSession(
-            @CookieValue(value = "refresh_token") String refreshToken
+            @CookieValue(value = "refresh_token") String refreshToken,
+            @RequestBody SessionMetaRequest sessionMetaRequest
     ) {
-        var authResultWrapper = authService.refreshSession(refreshToken);
+        var authResultWrapper = authService.refreshSession(refreshToken, sessionMetaRequest);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

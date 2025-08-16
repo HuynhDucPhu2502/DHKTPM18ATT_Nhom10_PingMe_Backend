@@ -24,10 +24,6 @@ public class LoginRequest {
     @NotBlank(message = "Mật khẩu người dùng không được để trống")
     private String password;
 
-    private String deviceType;
-
-    private String browser;
-
-    private String os;
+    private SessionMetaRequest sessionMetaRequest;
 
 }

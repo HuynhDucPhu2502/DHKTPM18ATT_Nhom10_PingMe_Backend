@@ -1,9 +1,6 @@
 package me.huynhducphu.PingMe_Backend.service;
 
-import me.huynhducphu.PingMe_Backend.dto.request.auth.ChangePasswordRequest;
-import me.huynhducphu.PingMe_Backend.dto.request.auth.ChangeProfileRequest;
-import me.huynhducphu.PingMe_Backend.dto.request.auth.LoginRequest;
-import me.huynhducphu.PingMe_Backend.dto.request.auth.RegisterRequest;
+import me.huynhducphu.PingMe_Backend.dto.request.auth.*;
 import me.huynhducphu.PingMe_Backend.dto.common.AuthResultWrapper;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.UserDetailResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.UserSessionResponse;
@@ -22,7 +19,7 @@ public interface AuthService {
 
     ResponseCookie logout();
 
-    AuthResultWrapper refreshSession(String refreshToken);
+    AuthResultWrapper refreshSession(String refreshToken, SessionMetaRequest sessionMetaRequest);
 
     User getCurrentUser();
 
