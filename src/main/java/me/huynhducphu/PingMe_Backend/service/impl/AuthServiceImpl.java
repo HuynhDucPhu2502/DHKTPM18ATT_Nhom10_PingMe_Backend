@@ -4,9 +4,9 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import me.huynhducphu.PingMe_Backend.dto.request.auth.ChangePasswordRequest;
 import me.huynhducphu.PingMe_Backend.dto.request.auth.ChangeProfileRequest;
-import me.huynhducphu.PingMe_Backend.dto.request.auth.LocalLoginRequest;
-import me.huynhducphu.PingMe_Backend.dto.request.auth.RegisterLocalRequest;
-import me.huynhducphu.PingMe_Backend.dto.response.auth.AuthResultWrapper;
+import me.huynhducphu.PingMe_Backend.dto.request.auth.LoginRequest;
+import me.huynhducphu.PingMe_Backend.dto.request.auth.RegisterRequest;
+import me.huynhducphu.PingMe_Backend.dto.common.AuthResultWrapper;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.DefaultAuthResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.UserDetailResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.UserSessionResponse;
@@ -66,10 +66,10 @@ public class AuthServiceImpl implements me.huynhducphu.PingMe_Backend.service.Au
 
     @Override
     public UserSessionResponse registerLocal(
-            RegisterLocalRequest registerLocalRequest) {
-        var user = modelMapper.map(registerLocalRequest, User.class);
+            RegisterRequest registerRequest) {
+        var user = modelMapper.map(registerRequest, User.class);
 
-        if (userRepository.existsByEmail(registerLocalRequest.getEmail()))
+        if (userRepository.existsByEmail(registerRequest.getEmail()))
             throw new DataIntegrityViolationException("Email đã tồn tại");
 
         user.setAuthProvider(AuthProvider.LOCAL);
@@ -80,10 +80,10 @@ public class AuthServiceImpl implements me.huynhducphu.PingMe_Backend.service.Au
     }
 
     @Override
-    public AuthResultWrapper loginLocal(LocalLoginRequest localLoginRequest) {
+    public AuthResultWrapper loginLocal(LoginRequest loginRequest) {
         var authenticationToken = new UsernamePasswordAuthenticationToken(
-                localLoginRequest.getEmail(),
-                localLoginRequest.getPassword()
+                loginRequest.getEmail(),
+                loginRequest.getPassword()
         );
 
         var authentication = authenticationManager.authenticate(authenticationToken);

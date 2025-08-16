@@ -4,8 +4,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import me.huynhducphu.PingMe_Backend.dto.request.auth.ChangePasswordRequest;
 import me.huynhducphu.PingMe_Backend.dto.request.auth.ChangeProfileRequest;
-import me.huynhducphu.PingMe_Backend.dto.request.auth.LocalLoginRequest;
-import me.huynhducphu.PingMe_Backend.dto.request.auth.RegisterLocalRequest;
+import me.huynhducphu.PingMe_Backend.dto.request.auth.LoginRequest;
+import me.huynhducphu.PingMe_Backend.dto.request.auth.RegisterRequest;
 import me.huynhducphu.PingMe_Backend.dto.response.ApiResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.DefaultAuthResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.UserDetailResponse;
@@ -29,18 +29,18 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<UserSessionResponse>> registerLocal(
-            @RequestBody @Valid RegisterLocalRequest registerLocalRequest
+            @RequestBody @Valid RegisterRequest registerRequest
     ) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(new ApiResponse<>(authService.registerLocal(registerLocalRequest)));
+                .body(new ApiResponse<>(authService.registerLocal(registerRequest)));
     }
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<DefaultAuthResponse>> loginLocal(
-            @RequestBody @Valid LocalLoginRequest localLoginRequest
+            @RequestBody @Valid LoginRequest loginRequest
     ) {
-        var authResultWrapper = authService.loginLocal(localLoginRequest);
+        var authResultWrapper = authService.loginLocal(loginRequest);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

@@ -2,9 +2,9 @@ package me.huynhducphu.PingMe_Backend.service;
 
 import me.huynhducphu.PingMe_Backend.dto.request.auth.ChangePasswordRequest;
 import me.huynhducphu.PingMe_Backend.dto.request.auth.ChangeProfileRequest;
-import me.huynhducphu.PingMe_Backend.dto.request.auth.LocalLoginRequest;
-import me.huynhducphu.PingMe_Backend.dto.request.auth.RegisterLocalRequest;
-import me.huynhducphu.PingMe_Backend.dto.response.auth.AuthResultWrapper;
+import me.huynhducphu.PingMe_Backend.dto.request.auth.LoginRequest;
+import me.huynhducphu.PingMe_Backend.dto.request.auth.RegisterRequest;
+import me.huynhducphu.PingMe_Backend.dto.common.AuthResultWrapper;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.UserDetailResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.UserSessionResponse;
 import me.huynhducphu.PingMe_Backend.model.User;
@@ -16,9 +16,9 @@ import org.springframework.web.multipart.MultipartFile;
  **/
 public interface AuthService {
     UserSessionResponse registerLocal(
-            RegisterLocalRequest registerLocalRequest);
+            RegisterRequest registerRequest);
 
-    AuthResultWrapper loginLocal(LocalLoginRequest localLoginRequest);
+    AuthResultWrapper loginLocal(LoginRequest loginRequest);
 
     ResponseCookie logout();
 
