@@ -27,7 +27,7 @@ public class S3ServiceImpl implements me.huynhducphu.PingMe_Backend.service.S3Se
     @Override
     public String uploadFile(
             MultipartFile file, String key,
-            boolean getUrl, int maxFileSize
+            boolean getUrl, long maxFileSize
     ) {
         try {
             if (file == null || file.isEmpty())
@@ -65,7 +65,7 @@ public class S3ServiceImpl implements me.huynhducphu.PingMe_Backend.service.S3Se
     public String uploadFile(
             MultipartFile file, String folder,
             String fileName, boolean getUrl,
-            int maxFileSize
+            long maxFileSize
     ) {
         String key = String.format("%s/%s", folder, fileName);
         return uploadFile(file, key, getUrl, maxFileSize);

@@ -14,6 +14,7 @@ import me.huynhducphu.PingMe_Backend.model.User;
 import me.huynhducphu.PingMe_Backend.model.constant.AuthProvider;
 import me.huynhducphu.PingMe_Backend.repository.UserRepository;
 import me.huynhducphu.PingMe_Backend.service.JwtService;
+import me.huynhducphu.PingMe_Backend.service.S3Service;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -25,6 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Admin 8/3/2025
@@ -37,11 +39,16 @@ public class AuthServiceImpl implements me.huynhducphu.PingMe_Backend.service.Au
 
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
+
     private final JwtService jwtService;
+    private final S3Service s3Service;
 
     private final ModelMapper modelMapper;
 
     private final UserRepository userRepository;
+
+    private static final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
+    private static final Long MAX_AVATAR_FILE_SIZE = 2 * 1024 * 1024L;
 
     @Value("${jwt.access-token-expiration}")
     private Long accessTokenExpiration;
@@ -86,7 +93,7 @@ public class AuthServiceImpl implements me.huynhducphu.PingMe_Backend.service.Au
     @Override
     public ResponseCookie logout() {
         return ResponseCookie
-                .from("refresh_token", "")
+                .from(REFRESH_TOKEN_COOKIE_NAME, "")
                 .httpOnly(true)
                 .path("/")
                 .sameSite(sameSite)
@@ -148,11 +155,30 @@ public class AuthServiceImpl implements me.huynhducphu.PingMe_Backend.service.Au
             ChangeProfileRequest changeProfileRequest
     ) {
         var user = getCurrentUser();
-        
+
         user.setName(changeProfileRequest.getName());
         user.setGender(changeProfileRequest.getGender());
         user.setAddress(changeProfileRequest.getAddress());
         user.setDob(changeProfileRequest.getDob());
+
+        return modelMapper.map(user, UserSessionResponse.class);
+    }
+
+    @Override
+    public UserSessionResponse updateCurrentUserAvatar(
+            MultipartFile avatarFile
+    ) {
+        var user = getCurrentUser();
+
+        String url = s3Service.uploadFile(
+                avatarFile,
+                "avatar",
+                user.getEmail(),
+                true,
+                MAX_AVATAR_FILE_SIZE
+        );
+
+        user.setAvatarUrl(url);
 
         return modelMapper.map(user, UserSessionResponse.class);
     }
@@ -166,7 +192,7 @@ public class AuthServiceImpl implements me.huynhducphu.PingMe_Backend.service.Au
                 accessToken
         );
         var refreshTokenCookie = ResponseCookie
-                .from("refresh_token", refreshToken)
+                .from(REFRESH_TOKEN_COOKIE_NAME, refreshToken)
                 .httpOnly(true)
                 .path("/")
                 .sameSite(sameSite)

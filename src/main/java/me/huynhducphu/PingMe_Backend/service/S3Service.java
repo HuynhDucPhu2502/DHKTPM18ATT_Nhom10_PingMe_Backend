@@ -8,13 +8,13 @@ import org.springframework.web.multipart.MultipartFile;
 public interface S3Service {
     String uploadFile(
             MultipartFile file, String key,
-            boolean getUrl, int maxFileSize
+            boolean getUrl, long maxFileSize
     );
 
     String uploadFile(
             MultipartFile file, String folder,
             String fileName, boolean getUrl,
-            int maxFileSize
+            long maxFileSize
     );
 
     void deleteFileByKey(String key);
