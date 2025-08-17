@@ -44,20 +44,6 @@ public class RefreshTokenRedisServiceImpl implements me.huynhducphu.PingMe_Backe
         redisSessionMetaTemplate.opsForValue().set(sessionId, sessionMeta, expire);
     }
 
-    private String buildKey(String token, String userId) {
-        return "auth::refresh_token:" + userId + ":" + DigestUtils.sha256Hex(token);
-    }
-
-    @Override
-    public boolean validateToken(String token, String userId) {
-        return redisSessionMetaTemplate.hasKey(buildKey(token, userId));
-    }
-
-    @Override
-    public void deleteRefreshToken(String token, String userId) {
-        redisSessionMetaTemplate.delete(buildKey(token, userId));
-    }
-
     @Override
     public List<SessionMetaResponse> getAllSessionMetas(String userId, String currentRefreshToken) {
         String keyPattern = "auth::refresh_token:" + userId + ":*";
@@ -83,8 +69,25 @@ public class RefreshTokenRedisServiceImpl implements me.huynhducphu.PingMe_Backe
     }
 
     @Override
+    public void deleteRefreshToken(String token, String userId) {
+        redisSessionMetaTemplate.delete(buildKey(token, userId));
+    }
+
+    @Override
     public void deleteRefreshToken(String key) {
         redisSessionMetaTemplate.delete(key);
+    }
+
+    // =====================================
+    // Utilities methods
+    // =====================================
+    @Override
+    public boolean validateToken(String token, String userId) {
+        return redisSessionMetaTemplate.hasKey(buildKey(token, userId));
+    }
+
+    private String buildKey(String token, String userId) {
+        return "auth::refresh_token:" + userId + ":" + DigestUtils.sha256Hex(token);
     }
 
 
