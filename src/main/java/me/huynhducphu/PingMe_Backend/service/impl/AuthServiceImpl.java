@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import me.huynhducphu.PingMe_Backend.dto.request.auth.*;
 import me.huynhducphu.PingMe_Backend.dto.common.AuthResultWrapper;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.DefaultAuthResponse;
+import me.huynhducphu.PingMe_Backend.dto.response.auth.SessionMetaResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.UserDetailResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.UserSessionResponse;
 import me.huynhducphu.PingMe_Backend.model.User;
@@ -17,6 +18,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseCookie;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Admin 8/3/2025
@@ -65,7 +68,7 @@ public class AuthServiceImpl implements me.huynhducphu.PingMe_Backend.service.Au
     private boolean secure;
 
     @Override
-    public UserSessionResponse registerLocal(
+    public UserSessionResponse register(
             RegisterRequest registerRequest) {
         var user = modelMapper.map(registerRequest, User.class);
 
@@ -80,7 +83,7 @@ public class AuthServiceImpl implements me.huynhducphu.PingMe_Backend.service.Au
     }
 
     @Override
-    public AuthResultWrapper loginLocal(LoginRequest loginRequest) {
+    public AuthResultWrapper login(LoginRequest loginRequest) {
         var authenticationToken = new UsernamePasswordAuthenticationToken(
                 loginRequest.getEmail(),
                 loginRequest.getPassword()
@@ -93,7 +96,16 @@ public class AuthServiceImpl implements me.huynhducphu.PingMe_Backend.service.Au
     }
 
     @Override
-    public ResponseCookie logout() {
+    public ResponseCookie logout(String refreshToken) {
+        if (refreshToken != null) {
+            String email = jwtService.decodeJwt(refreshToken).getSubject();
+            var refreshTokenUser = userRepository
+                    .getUserByEmail(email)
+                    .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy người dùng"));
+
+            refreshTokenRedisService.deleteRefreshToken(refreshToken, refreshTokenUser.getId().toString());
+        }
+
         return ResponseCookie
                 .from(REFRESH_TOKEN_COOKIE_NAME, "")
                 .httpOnly(true)
@@ -109,11 +121,16 @@ public class AuthServiceImpl implements me.huynhducphu.PingMe_Backend.service.Au
             String refreshToken, SessionMetaRequest sessionMetaRequest
     ) {
         String email = jwtService.decodeJwt(refreshToken).getSubject();
-        var user = userRepository
+        var refreshTokenUser = userRepository
                 .getUserByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy người dùng"));
 
-        return buildAuthResultWrapper(user, sessionMetaRequest);
+        if (!refreshTokenRedisService.validateToken(refreshToken, refreshTokenUser.getId().toString()))
+            throw new AccessDeniedException("Refresh token không hợp lệ");
+
+        refreshTokenRedisService.deleteRefreshToken(refreshToken, refreshTokenUser.getId().toString());
+
+        return buildAuthResultWrapper(refreshTokenUser, sessionMetaRequest);
     }
 
     @Override
@@ -126,6 +143,23 @@ public class AuthServiceImpl implements me.huynhducphu.PingMe_Backend.service.Au
     public UserDetailResponse getCurrentUserDetail() {
         var user = getCurrentUser();
         return modelMapper.map(user, UserDetailResponse.class);
+    }
+
+    @Override
+    public List<SessionMetaResponse> getCurrentUserSessions(
+            String refreshToken
+    ) {
+        var currentUser = getCurrentUser();
+
+        String email = jwtService.decodeJwt(refreshToken).getSubject();
+        var refreshTokenUser = userRepository
+                .getUserByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy người dùng"));
+
+        if (!refreshTokenUser.getId().equals(currentUser.getId()))
+            throw new AccessDeniedException("Refresh token không hợp lệ");
+
+        return refreshTokenRedisService.getAllSessionMetas(currentUser.getId().toString(), refreshToken);
     }
 
     @Override
