@@ -24,6 +24,8 @@ public interface AuthService {
 
     AuthResultWrapper refreshSession(String refreshToken, SessionMetaRequest sessionMetaRequest);
 
+    void deleteCurrentUserSession(String sessionId);
+
     User getCurrentUser();
 
     UserSessionResponse getCurrentUserSession();

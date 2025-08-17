@@ -126,7 +126,7 @@ public class AuthServiceImpl implements me.huynhducphu.PingMe_Backend.service.Au
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy người dùng"));
 
         if (!refreshTokenRedisService.validateToken(refreshToken, refreshTokenUser.getId().toString()))
-            throw new AccessDeniedException("Refresh token không hợp lệ");
+            throw new AccessDeniedException("Không có quyền truy cập");
 
         refreshTokenRedisService.deleteRefreshToken(refreshToken, refreshTokenUser.getId().toString());
 
@@ -157,7 +157,7 @@ public class AuthServiceImpl implements me.huynhducphu.PingMe_Backend.service.Au
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy người dùng"));
 
         if (!refreshTokenUser.getId().equals(currentUser.getId()))
-            throw new AccessDeniedException("Refresh token không hợp lệ");
+            throw new AccessDeniedException("Không có quyền truy cập");
 
         return refreshTokenRedisService.getAllSessionMetas(currentUser.getId().toString(), refreshToken);
     }
@@ -210,10 +210,22 @@ public class AuthServiceImpl implements me.huynhducphu.PingMe_Backend.service.Au
         return modelMapper.map(user, UserSessionResponse.class);
     }
 
-    // =====================================
-    // Ulities methods
-    // =====================================
+    @Override
+    public void deleteCurrentUserSession(String sessionId) {
+        String[] part = sessionId.split(":");
+        String sessionUserId = part[3];
 
+        var currentUser = getCurrentUser();
+
+        if (!currentUser.getId().toString().equals(sessionUserId))
+            throw new AccessDeniedException("Không có quyền truy cập");
+
+        refreshTokenRedisService.deleteRefreshToken(sessionId);
+    }
+
+    // =====================================
+    // Utilities methods
+    // =====================================
     @Override
     public User getCurrentUser() {
         String email = SecurityContextHolder

@@ -121,4 +121,15 @@ public class AuthController {
                 .body(new ApiResponse<>(authService.updateCurrentUserAvatar(avatarFile)));
     }
 
+    @DeleteMapping("/me/sessions/{sessionId}")
+    public ResponseEntity<ApiResponse<Void>> deleteCurrentUserSessions(
+            @PathVariable String sessionId
+    ) {
+        authService.deleteCurrentUserSession(sessionId);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ApiResponse<>());
+    }
+
 }
