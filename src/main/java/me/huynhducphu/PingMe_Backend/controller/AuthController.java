@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import me.huynhducphu.PingMe_Backend.dto.request.auth.*;
 import me.huynhducphu.PingMe_Backend.dto.response.ApiResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.DefaultAuthResponse;
+import me.huynhducphu.PingMe_Backend.dto.response.auth.SessionMetaResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.UserDetailResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.UserSessionResponse;
 import me.huynhducphu.PingMe_Backend.service.AuthService;
@@ -13,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 /**
  * Admin 8/4/2025
@@ -30,14 +33,14 @@ public class AuthController {
     ) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(new ApiResponse<>(authService.registerLocal(registerRequest)));
+                .body(new ApiResponse<>(authService.register(registerRequest)));
     }
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<DefaultAuthResponse>> loginLocal(
             @RequestBody @Valid LoginRequest loginRequest
     ) {
-        var authResultWrapper = authService.loginLocal(loginRequest);
+        var authResultWrapper = authService.login(loginRequest);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -46,10 +49,12 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout() {
+    public ResponseEntity<Void> logout(
+            @CookieValue(value = "refresh_token", required = false) String refreshToken
+    ) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .header(HttpHeaders.SET_COOKIE, authService.logout().toString())
+                .header(HttpHeaders.SET_COOKIE, authService.logout(refreshToken).toString())
                 .build();
     }
 
@@ -78,6 +83,15 @@ public class AuthController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new ApiResponse<>(authService.getCurrentUserDetail()));
+    }
+
+    @GetMapping("/me/sessions")
+    public ResponseEntity<ApiResponse<List<SessionMetaResponse>>> getCurrentUserSessions(
+            @CookieValue(value = "refresh_token") String refreshToken
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ApiResponse<>(authService.getCurrentUserSessions(refreshToken)));
     }
 
     @PostMapping("/me/password")
