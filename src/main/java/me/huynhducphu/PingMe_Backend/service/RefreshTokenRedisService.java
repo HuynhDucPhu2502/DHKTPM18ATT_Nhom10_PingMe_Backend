@@ -1,8 +1,10 @@
 package me.huynhducphu.PingMe_Backend.service;
 
 import me.huynhducphu.PingMe_Backend.dto.request.auth.SessionMetaRequest;
+import me.huynhducphu.PingMe_Backend.dto.response.auth.SessionMetaResponse;
 
 import java.time.Duration;
+import java.util.List;
 
 /**
  * Admin 8/16/2025
@@ -16,6 +18,8 @@ public interface RefreshTokenRedisService {
     boolean validateToken(String token, String userId);
 
     void deleteRefreshToken(String token, String userId);
+
+    List<SessionMetaResponse> getAllSessionMetas(String userId, String currentRefreshToken);
 
     void deleteRefreshToken(String key);
 }
