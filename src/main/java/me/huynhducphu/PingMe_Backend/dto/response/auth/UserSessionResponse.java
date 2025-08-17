@@ -17,6 +17,5 @@ public class UserSessionResponse {
     private String name;
     private String avatarUrl;
     private String updatedAt;
-    private SessionMeta sessionMeta;
-
+    
 }
