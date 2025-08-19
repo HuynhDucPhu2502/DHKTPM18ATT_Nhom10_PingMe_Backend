@@ -1,6 +1,6 @@
 package me.huynhducphu.PingMe_Backend.service;
 
-import me.huynhducphu.PingMe_Backend.model.User;
+import me.huynhducphu.PingMe_Backend.model.user.User;
 import org.springframework.security.oauth2.jwt.Jwt;
 
 /**
