@@ -6,7 +6,7 @@ import me.huynhducphu.PingMe_Backend.dto.request.auth.*;
 import me.huynhducphu.PingMe_Backend.dto.common.AuthResultWrapper;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.DefaultAuthResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.SessionMetaResponse;
-import me.huynhducphu.PingMe_Backend.dto.response.auth.UserDetailResponse;
+import me.huynhducphu.PingMe_Backend.dto.response.auth.UserInfoResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.UserSessionResponse;
 import me.huynhducphu.PingMe_Backend.model.user.User;
 import me.huynhducphu.PingMe_Backend.model.constant.AuthProvider;
@@ -143,9 +143,9 @@ public class AuthServiceImpl implements me.huynhducphu.PingMe_Backend.service.Au
     }
 
     @Override
-    public UserDetailResponse getCurrentUserDetail() {
+    public UserInfoResponse getCurrentUserInfo() {
         var user = currentUserProvider.get();
-        return modelMapper.map(user, UserDetailResponse.class);
+        return modelMapper.map(user, UserInfoResponse.class);
     }
 
     @Override

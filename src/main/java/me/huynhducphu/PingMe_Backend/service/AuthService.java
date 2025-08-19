@@ -3,7 +3,7 @@ package me.huynhducphu.PingMe_Backend.service;
 import me.huynhducphu.PingMe_Backend.dto.request.auth.*;
 import me.huynhducphu.PingMe_Backend.dto.common.AuthResultWrapper;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.SessionMetaResponse;
-import me.huynhducphu.PingMe_Backend.dto.response.auth.UserDetailResponse;
+import me.huynhducphu.PingMe_Backend.dto.response.auth.UserInfoResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.UserSessionResponse;
 import org.springframework.http.ResponseCookie;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,7 +27,7 @@ public interface AuthService {
 
     UserSessionResponse getCurrentUserSession();
 
-    UserDetailResponse getCurrentUserDetail();
+    UserInfoResponse getCurrentUserInfo();
 
     List<SessionMetaResponse> getCurrentUserAllSessionMetas(
             String refreshToken

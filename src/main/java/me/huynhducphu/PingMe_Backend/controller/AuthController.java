@@ -6,7 +6,7 @@ import me.huynhducphu.PingMe_Backend.dto.request.auth.*;
 import me.huynhducphu.PingMe_Backend.dto.response.ApiResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.DefaultAuthResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.SessionMetaResponse;
-import me.huynhducphu.PingMe_Backend.dto.response.auth.UserDetailResponse;
+import me.huynhducphu.PingMe_Backend.dto.response.auth.UserInfoResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.UserSessionResponse;
 import me.huynhducphu.PingMe_Backend.service.AuthService;
 import org.springframework.http.HttpHeaders;
@@ -78,11 +78,11 @@ public class AuthController {
                 .body(new ApiResponse<>(authService.getCurrentUserSession()));
     }
 
-    @GetMapping("/me/detail")
-    public ResponseEntity<ApiResponse<UserDetailResponse>> getCurrentUserDetail() {
+    @GetMapping("/me/info")
+    public ResponseEntity<ApiResponse<UserInfoResponse>> getCurrentUserInfo() {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ApiResponse<>(authService.getCurrentUserDetail()));
+                .body(new ApiResponse<>(authService.getCurrentUserInfo()));
     }
 
     @GetMapping("/me/sessions")
