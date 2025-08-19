@@ -6,7 +6,4 @@ package me.huynhducphu.PingMe_Backend.model.constant;
 public enum FriendshipStatus {
     PENDING,
     ACCEPTED,
-    DECLINED,
-    BLOCKED
-
 }

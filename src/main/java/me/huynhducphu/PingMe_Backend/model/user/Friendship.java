@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import me.huynhducphu.PingMe_Backend.model.common.BaseEntity;
 import me.huynhducphu.PingMe_Backend.model.constant.FriendshipStatus;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.util.Objects;
 
@@ -61,7 +62,7 @@ public class Friendship extends BaseEntity {
         Long b = userB.getId();
 
         if (Objects.equals(a, b))
-            throw new IllegalArgumentException("Không thể kết bạn với chính mình");
+            throw new AccessDeniedException("Không thể kết bạn với chính mình");
         else if (a < b) {
             userLowId = a;
             userHighId = b;
