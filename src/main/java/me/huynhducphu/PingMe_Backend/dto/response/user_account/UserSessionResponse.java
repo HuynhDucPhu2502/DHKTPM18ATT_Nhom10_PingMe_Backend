@@ -1,4 +1,4 @@
-package me.huynhducphu.PingMe_Backend.dto.response.user;
+package me.huynhducphu.PingMe_Backend.dto.response.user_account;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,10 +10,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class DefaultUserResponse {
+public class UserSessionResponse {
 
-    private Long id;
     private String email;
     private String name;
+    private String avatarUrl;
+    private String updatedAt;
 
 }

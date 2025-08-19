@@ -2,12 +2,12 @@ package me.huynhducphu.PingMe_Backend.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import me.huynhducphu.PingMe_Backend.dto.request.auth.*;
+import me.huynhducphu.PingMe_Backend.dto.request.user_account.*;
 import me.huynhducphu.PingMe_Backend.dto.response.ApiResponse;
-import me.huynhducphu.PingMe_Backend.dto.response.auth.DefaultAuthResponse;
-import me.huynhducphu.PingMe_Backend.dto.response.auth.UserDeviceMetaResponse;
-import me.huynhducphu.PingMe_Backend.dto.response.auth.UserInfoResponse;
-import me.huynhducphu.PingMe_Backend.dto.response.auth.UserSessionResponse;
+import me.huynhducphu.PingMe_Backend.dto.response.user_account.DefaultAuthResponse;
+import me.huynhducphu.PingMe_Backend.dto.response.user_account.UserDeviceMetaResponse;
+import me.huynhducphu.PingMe_Backend.dto.response.user_account.UserInfoResponse;
+import me.huynhducphu.PingMe_Backend.dto.response.user_account.UserSessionResponse;
 import me.huynhducphu.PingMe_Backend.service.user.UserAccountService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

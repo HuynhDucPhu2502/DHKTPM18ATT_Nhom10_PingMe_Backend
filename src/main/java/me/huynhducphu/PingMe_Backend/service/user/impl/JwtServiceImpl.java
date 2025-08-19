@@ -2,7 +2,7 @@ package me.huynhducphu.PingMe_Backend.service.user.impl;
 
 import lombok.RequiredArgsConstructor;
 import me.huynhducphu.PingMe_Backend.config.auth.AuthConfiguration;
-import me.huynhducphu.PingMe_Backend.dto.response.auth.UserSessionResponse;
+import me.huynhducphu.PingMe_Backend.dto.response.user_account.UserSessionResponse;
 import me.huynhducphu.PingMe_Backend.model.user.User;
 import me.huynhducphu.PingMe_Backend.service.user.JwtService;
 import org.modelmapper.ModelMapper;

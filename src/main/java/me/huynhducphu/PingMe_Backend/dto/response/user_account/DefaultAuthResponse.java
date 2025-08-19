@@ -1,4 +1,4 @@
-package me.huynhducphu.PingMe_Backend.dto.response.auth;
+package me.huynhducphu.PingMe_Backend.dto.response.user_account;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

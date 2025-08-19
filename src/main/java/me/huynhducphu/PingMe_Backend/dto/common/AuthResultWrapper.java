@@ -3,7 +3,7 @@ package me.huynhducphu.PingMe_Backend.dto.common;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import me.huynhducphu.PingMe_Backend.dto.response.auth.DefaultAuthResponse;
+import me.huynhducphu.PingMe_Backend.dto.response.user_account.DefaultAuthResponse;
 import org.springframework.http.ResponseCookie;
 
 /**

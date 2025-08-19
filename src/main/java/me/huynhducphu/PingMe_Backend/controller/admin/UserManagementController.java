@@ -1,12 +1,12 @@
-package me.huynhducphu.PingMe_Backend.controller;
+package me.huynhducphu.PingMe_Backend.controller.admin;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import me.huynhducphu.PingMe_Backend.dto.request.user.CreateUserRequest;
+import me.huynhducphu.PingMe_Backend.dto.admin.request.user.CreateUserRequest;
 import me.huynhducphu.PingMe_Backend.dto.response.ApiResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.PageResponse;
-import me.huynhducphu.PingMe_Backend.dto.response.user.DefaultUserResponse;
-import me.huynhducphu.PingMe_Backend.service.admin.UserService;
+import me.huynhducphu.PingMe_Backend.dto.admin.response.user.DefaultUserResponse;
+import me.huynhducphu.PingMe_Backend.service.admin.UserManagementService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -21,9 +21,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
-public class UserController {
+public class UserManagementController {
 
-    private final UserService userService;
+    private final UserManagementService userManagementService;
 
     @PostMapping
     public ResponseEntity<ApiResponse<DefaultUserResponse>> saveUser(
@@ -31,7 +31,7 @@ public class UserController {
     ) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(new ApiResponse<>(userService.saveUser(createUserRequest)));
+                .body(new ApiResponse<>(userManagementService.saveUser(createUserRequest)));
     }
 
     @GetMapping
@@ -39,7 +39,7 @@ public class UserController {
             @PageableDefault(size = 5) Pageable pageable
     ) {
         Page<DefaultUserResponse> defaultUserResponseDtoPage =
-                userService.getAllUsers(pageable);
+                userManagementService.getAllUsers(pageable);
 
         PageResponse<DefaultUserResponse> pageResponse =
                 new PageResponse<>(defaultUserResponseDtoPage);
@@ -53,7 +53,7 @@ public class UserController {
     public ResponseEntity<ApiResponse<DefaultUserResponse>> getUserById(@PathVariable Long id) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ApiResponse<>(userService.getUserById(id)));
+                .body(new ApiResponse<>(userManagementService.getUserById(id)));
     }
 
 

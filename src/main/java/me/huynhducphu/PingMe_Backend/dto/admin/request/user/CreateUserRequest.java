@@ -1,4 +1,4 @@
-package me.huynhducphu.PingMe_Backend.dto.request.user;
+package me.huynhducphu.PingMe_Backend.dto.admin.request.user;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

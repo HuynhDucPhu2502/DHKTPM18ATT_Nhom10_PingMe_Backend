@@ -2,12 +2,12 @@ package me.huynhducphu.PingMe_Backend.service.admin.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import me.huynhducphu.PingMe_Backend.dto.request.user.CreateUserRequest;
-import me.huynhducphu.PingMe_Backend.dto.response.user.DefaultUserResponse;
+import me.huynhducphu.PingMe_Backend.dto.admin.request.user.CreateUserRequest;
+import me.huynhducphu.PingMe_Backend.dto.admin.response.user.DefaultUserResponse;
 import me.huynhducphu.PingMe_Backend.model.user.User;
 import me.huynhducphu.PingMe_Backend.model.constant.AuthProvider;
 import me.huynhducphu.PingMe_Backend.repository.UserRepository;
-import me.huynhducphu.PingMe_Backend.service.admin.UserService;
+import me.huynhducphu.PingMe_Backend.service.admin.UserManagementService;
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
  **/
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService {
+public class UserManagementServiceImpl implements UserManagementService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;

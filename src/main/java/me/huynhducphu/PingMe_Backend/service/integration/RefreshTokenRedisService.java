@@ -1,7 +1,7 @@
 package me.huynhducphu.PingMe_Backend.service.integration;
 
-import me.huynhducphu.PingMe_Backend.dto.request.auth.SessionMetaRequest;
-import me.huynhducphu.PingMe_Backend.dto.response.auth.UserDeviceMetaResponse;
+import me.huynhducphu.PingMe_Backend.dto.request.user_account.SessionMetaRequest;
+import me.huynhducphu.PingMe_Backend.dto.response.user_account.UserDeviceMetaResponse;
 
 import java.time.Duration;
 import java.util.List;

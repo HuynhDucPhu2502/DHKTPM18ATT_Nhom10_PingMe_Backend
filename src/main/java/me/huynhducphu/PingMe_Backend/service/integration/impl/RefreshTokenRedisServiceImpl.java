@@ -1,8 +1,8 @@
 package me.huynhducphu.PingMe_Backend.service.integration.impl;
 
 import lombok.RequiredArgsConstructor;
-import me.huynhducphu.PingMe_Backend.dto.request.auth.SessionMetaRequest;
-import me.huynhducphu.PingMe_Backend.dto.response.auth.UserDeviceMetaResponse;
+import me.huynhducphu.PingMe_Backend.dto.request.user_account.SessionMetaRequest;
+import me.huynhducphu.PingMe_Backend.dto.response.user_account.UserDeviceMetaResponse;
 import me.huynhducphu.PingMe_Backend.model.common.DeviceMeta;
 import me.huynhducphu.PingMe_Backend.service.integration.RefreshTokenRedisService;
 import org.apache.commons.codec.digest.DigestUtils;

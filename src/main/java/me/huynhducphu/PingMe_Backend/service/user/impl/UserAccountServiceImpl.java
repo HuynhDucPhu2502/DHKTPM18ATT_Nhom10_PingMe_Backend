@@ -2,12 +2,12 @@ package me.huynhducphu.PingMe_Backend.service.user.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import me.huynhducphu.PingMe_Backend.dto.request.auth.*;
+import me.huynhducphu.PingMe_Backend.dto.request.user_account.*;
 import me.huynhducphu.PingMe_Backend.dto.common.AuthResultWrapper;
-import me.huynhducphu.PingMe_Backend.dto.response.auth.DefaultAuthResponse;
-import me.huynhducphu.PingMe_Backend.dto.response.auth.UserDeviceMetaResponse;
-import me.huynhducphu.PingMe_Backend.dto.response.auth.UserInfoResponse;
-import me.huynhducphu.PingMe_Backend.dto.response.auth.UserSessionResponse;
+import me.huynhducphu.PingMe_Backend.dto.response.user_account.DefaultAuthResponse;
+import me.huynhducphu.PingMe_Backend.dto.response.user_account.UserDeviceMetaResponse;
+import me.huynhducphu.PingMe_Backend.dto.response.user_account.UserInfoResponse;
+import me.huynhducphu.PingMe_Backend.dto.response.user_account.UserSessionResponse;
 import me.huynhducphu.PingMe_Backend.model.user.User;
 import me.huynhducphu.PingMe_Backend.model.constant.AuthProvider;
 import me.huynhducphu.PingMe_Backend.repository.UserRepository;

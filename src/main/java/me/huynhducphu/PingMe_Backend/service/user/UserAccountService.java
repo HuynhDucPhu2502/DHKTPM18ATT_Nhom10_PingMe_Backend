@@ -1,10 +1,10 @@
 package me.huynhducphu.PingMe_Backend.service.user;
 
-import me.huynhducphu.PingMe_Backend.dto.request.auth.*;
+import me.huynhducphu.PingMe_Backend.dto.request.user_account.*;
 import me.huynhducphu.PingMe_Backend.dto.common.AuthResultWrapper;
-import me.huynhducphu.PingMe_Backend.dto.response.auth.UserDeviceMetaResponse;
-import me.huynhducphu.PingMe_Backend.dto.response.auth.UserInfoResponse;
-import me.huynhducphu.PingMe_Backend.dto.response.auth.UserSessionResponse;
+import me.huynhducphu.PingMe_Backend.dto.response.user_account.UserDeviceMetaResponse;
+import me.huynhducphu.PingMe_Backend.dto.response.user_account.UserInfoResponse;
+import me.huynhducphu.PingMe_Backend.dto.response.user_account.UserSessionResponse;
 import org.springframework.http.ResponseCookie;
 import org.springframework.web.multipart.MultipartFile;
 
