@@ -1,10 +1,10 @@
-package me.huynhducphu.PingMe_Backend.service.user.impl;
+package me.huynhducphu.PingMe_Backend.service.user_account.impl;
 
 import lombok.RequiredArgsConstructor;
 import me.huynhducphu.PingMe_Backend.config.auth.AuthConfiguration;
 import me.huynhducphu.PingMe_Backend.dto.response.user_account.UserSessionResponse;
 import me.huynhducphu.PingMe_Backend.model.user.User;
-import me.huynhducphu.PingMe_Backend.service.user.JwtService;
+import me.huynhducphu.PingMe_Backend.service.user_account.JwtService;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Service;

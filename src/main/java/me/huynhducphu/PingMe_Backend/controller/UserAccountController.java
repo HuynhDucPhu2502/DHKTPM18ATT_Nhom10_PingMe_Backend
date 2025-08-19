@@ -8,7 +8,7 @@ import me.huynhducphu.PingMe_Backend.dto.response.user_account.DefaultAuthRespon
 import me.huynhducphu.PingMe_Backend.dto.response.user_account.UserDeviceMetaResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.user_account.UserInfoResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.user_account.UserSessionResponse;
-import me.huynhducphu.PingMe_Backend.service.user.UserAccountService;
+import me.huynhducphu.PingMe_Backend.service.user_account.UserAccountService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

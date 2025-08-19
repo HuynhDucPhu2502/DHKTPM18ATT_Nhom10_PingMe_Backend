@@ -1,9 +1,9 @@
-package me.huynhducphu.PingMe_Backend.service.user.impl;
+package me.huynhducphu.PingMe_Backend.service.user_account.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import me.huynhducphu.PingMe_Backend.dto.request.user_account.*;
-import me.huynhducphu.PingMe_Backend.dto.common.AuthResultWrapper;
+import me.huynhducphu.PingMe_Backend.dto.response.user_account.common.AuthResultWrapper;
 import me.huynhducphu.PingMe_Backend.dto.response.user_account.DefaultAuthResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.user_account.UserDeviceMetaResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.user_account.UserInfoResponse;
@@ -11,8 +11,8 @@ import me.huynhducphu.PingMe_Backend.dto.response.user_account.UserSessionRespon
 import me.huynhducphu.PingMe_Backend.model.user.User;
 import me.huynhducphu.PingMe_Backend.model.constant.AuthProvider;
 import me.huynhducphu.PingMe_Backend.repository.UserRepository;
-import me.huynhducphu.PingMe_Backend.service.user.UserAccountService;
-import me.huynhducphu.PingMe_Backend.service.user.JwtService;
+import me.huynhducphu.PingMe_Backend.service.user_account.UserAccountService;
+import me.huynhducphu.PingMe_Backend.service.user_account.JwtService;
 import me.huynhducphu.PingMe_Backend.service.common.CurrentUserProvider;
 import me.huynhducphu.PingMe_Backend.service.integration.RefreshTokenRedisService;
 import me.huynhducphu.PingMe_Backend.service.integration.S3Service;
