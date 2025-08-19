@@ -1,11 +1,6 @@
-package me.huynhducphu.PingMe_Backend.controller;
+package me.huynhducphu.PingMe_Backend.controller.ws;
 
-import me.huynhducphu.PingMe_Backend.model.ChatMessage;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
-
-import java.security.Principal;
 
 /**
  * Admin 8/11/2025

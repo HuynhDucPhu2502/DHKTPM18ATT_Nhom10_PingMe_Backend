@@ -1,18 +1,18 @@
-package me.huynhducphu.PingMe_Backend.service.account.impl;
+package me.huynhducphu.PingMe_Backend.service.user.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import me.huynhducphu.PingMe_Backend.dto.request.auth.*;
 import me.huynhducphu.PingMe_Backend.dto.common.AuthResultWrapper;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.DefaultAuthResponse;
-import me.huynhducphu.PingMe_Backend.dto.response.auth.SessionMetaResponse;
+import me.huynhducphu.PingMe_Backend.dto.response.auth.UserDeviceMetaResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.UserInfoResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.UserSessionResponse;
 import me.huynhducphu.PingMe_Backend.model.user.User;
 import me.huynhducphu.PingMe_Backend.model.constant.AuthProvider;
 import me.huynhducphu.PingMe_Backend.repository.UserRepository;
-import me.huynhducphu.PingMe_Backend.service.account.AccountManagementService;
-import me.huynhducphu.PingMe_Backend.service.account.JwtService;
+import me.huynhducphu.PingMe_Backend.service.user.UserAccountService;
+import me.huynhducphu.PingMe_Backend.service.user.JwtService;
 import me.huynhducphu.PingMe_Backend.service.common.CurrentUserProvider;
 import me.huynhducphu.PingMe_Backend.service.integration.RefreshTokenRedisService;
 import me.huynhducphu.PingMe_Backend.service.integration.S3Service;
@@ -41,7 +41,7 @@ import java.util.List;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 @Transactional
-public class AccountManagementServiceImpl implements AccountManagementService {
+public class UserAccountServiceImpl implements UserAccountService {
 
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
@@ -150,7 +150,7 @@ public class AccountManagementServiceImpl implements AccountManagementService {
     }
 
     @Override
-    public List<SessionMetaResponse> getCurrentUserAllSessionMetas(
+    public List<UserDeviceMetaResponse> getCurrentUserAllDeviceMetas(
             String refreshToken
     ) {
         var currentUser = currentUserProvider.get();
@@ -163,7 +163,7 @@ public class AccountManagementServiceImpl implements AccountManagementService {
         if (!refreshTokenUser.getId().equals(currentUser.getId()))
             throw new AccessDeniedException("Không có quyền truy cập");
 
-        return refreshTokenRedisService.getAllSessionMetas(currentUser.getId().toString(), refreshToken);
+        return refreshTokenRedisService.getAllDeviceMetas(currentUser.getId().toString(), refreshToken);
     }
 
     @Override
@@ -215,7 +215,7 @@ public class AccountManagementServiceImpl implements AccountManagementService {
     }
 
     @Override
-    public void deleteCurrentUserSession(String sessionId) {
+    public void deleteCurrentUserDeviceMeta(String sessionId) {
         String[] part = sessionId.split(":");
         String sessionUserId = part[3];
 

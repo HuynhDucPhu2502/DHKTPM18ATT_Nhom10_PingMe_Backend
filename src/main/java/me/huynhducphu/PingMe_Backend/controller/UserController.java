@@ -6,7 +6,7 @@ import me.huynhducphu.PingMe_Backend.dto.request.user.CreateUserRequest;
 import me.huynhducphu.PingMe_Backend.dto.response.ApiResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.PageResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.user.DefaultUserResponse;
-import me.huynhducphu.PingMe_Backend.service.common.UserService;
+import me.huynhducphu.PingMe_Backend.service.admin.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -35,15 +35,18 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<PageResponse<DefaultUserResponse>> getAllUsers(
+    public ResponseEntity<ApiResponse<PageResponse<DefaultUserResponse>>> getAllUsers(
             @PageableDefault(size = 5) Pageable pageable
     ) {
         Page<DefaultUserResponse> defaultUserResponseDtoPage =
                 userService.getAllUsers(pageable);
 
+        PageResponse<DefaultUserResponse> pageResponse =
+                new PageResponse<>(defaultUserResponseDtoPage);
+
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new PageResponse<>(defaultUserResponseDtoPage));
+                .body(new ApiResponse<>(pageResponse));
     }
 
     @GetMapping("/{id}")

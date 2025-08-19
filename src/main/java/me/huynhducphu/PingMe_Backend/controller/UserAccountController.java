@@ -5,10 +5,10 @@ import lombok.RequiredArgsConstructor;
 import me.huynhducphu.PingMe_Backend.dto.request.auth.*;
 import me.huynhducphu.PingMe_Backend.dto.response.ApiResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.DefaultAuthResponse;
-import me.huynhducphu.PingMe_Backend.dto.response.auth.SessionMetaResponse;
+import me.huynhducphu.PingMe_Backend.dto.response.auth.UserDeviceMetaResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.UserInfoResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.UserSessionResponse;
-import me.huynhducphu.PingMe_Backend.service.account.AccountManagementService;
+import me.huynhducphu.PingMe_Backend.service.user.UserAccountService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +23,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
-public class AuthController {
+public class UserAccountController {
 
-    private final AccountManagementService accountManagementService;
+    private final UserAccountService userAccountService;
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<UserSessionResponse>> registerLocal(
@@ -33,14 +33,14 @@ public class AuthController {
     ) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(new ApiResponse<>(accountManagementService.register(registerRequest)));
+                .body(new ApiResponse<>(userAccountService.register(registerRequest)));
     }
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<DefaultAuthResponse>> loginLocal(
             @RequestBody @Valid LoginRequest loginRequest
     ) {
-        var authResultWrapper = accountManagementService.login(loginRequest);
+        var authResultWrapper = userAccountService.login(loginRequest);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -54,7 +54,7 @@ public class AuthController {
     ) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .header(HttpHeaders.SET_COOKIE, accountManagementService.logout(refreshToken).toString())
+                .header(HttpHeaders.SET_COOKIE, userAccountService.logout(refreshToken).toString())
                 .build();
     }
 
@@ -63,7 +63,7 @@ public class AuthController {
             @CookieValue(value = "refresh_token") String refreshToken,
             @RequestBody SessionMetaRequest sessionMetaRequest
     ) {
-        var authResultWrapper = accountManagementService.refreshSession(refreshToken, sessionMetaRequest);
+        var authResultWrapper = userAccountService.refreshSession(refreshToken, sessionMetaRequest);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -75,23 +75,23 @@ public class AuthController {
     public ResponseEntity<ApiResponse<UserSessionResponse>> getCurrentUserSession() {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ApiResponse<>(accountManagementService.getCurrentUserSession()));
+                .body(new ApiResponse<>(userAccountService.getCurrentUserSession()));
     }
 
     @GetMapping("/me/info")
     public ResponseEntity<ApiResponse<UserInfoResponse>> getCurrentUserInfo() {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ApiResponse<>(accountManagementService.getCurrentUserInfo()));
+                .body(new ApiResponse<>(userAccountService.getCurrentUserInfo()));
     }
 
     @GetMapping("/me/sessions")
-    public ResponseEntity<ApiResponse<List<SessionMetaResponse>>> getCurrentUserSessions(
+    public ResponseEntity<ApiResponse<List<UserDeviceMetaResponse>>> getCurrentUserAllDeviceMetas(
             @CookieValue(value = "refresh_token") String refreshToken
     ) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ApiResponse<>(accountManagementService.getCurrentUserAllSessionMetas(refreshToken)));
+                .body(new ApiResponse<>(userAccountService.getCurrentUserAllDeviceMetas(refreshToken)));
     }
 
     @PostMapping("/me/password")
@@ -100,7 +100,7 @@ public class AuthController {
     ) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ApiResponse<>(accountManagementService.updateCurrentUserPassword(changePasswordRequest)));
+                .body(new ApiResponse<>(userAccountService.updateCurrentUserPassword(changePasswordRequest)));
     }
 
     @PostMapping("/me/profile")
@@ -109,7 +109,7 @@ public class AuthController {
     ) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ApiResponse<>(accountManagementService.updateCurrentUserProfile(changeProfileRequest)));
+                .body(new ApiResponse<>(userAccountService.updateCurrentUserProfile(changeProfileRequest)));
     }
 
     @PostMapping("/me/avatar")
@@ -118,14 +118,14 @@ public class AuthController {
     ) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ApiResponse<>(accountManagementService.updateCurrentUserAvatar(avatarFile)));
+                .body(new ApiResponse<>(userAccountService.updateCurrentUserAvatar(avatarFile)));
     }
 
     @DeleteMapping("/me/sessions/{sessionId}")
-    public ResponseEntity<ApiResponse<Void>> deleteCurrentUserSessions(
+    public ResponseEntity<ApiResponse<Void>> deleteCurrentUserDeviceMeta(
             @PathVariable String sessionId
     ) {
-        accountManagementService.deleteCurrentUserSession(sessionId);
+        userAccountService.deleteCurrentUserDeviceMeta(sessionId);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

@@ -1,7 +1,7 @@
 package me.huynhducphu.PingMe_Backend.service.integration;
 
 import me.huynhducphu.PingMe_Backend.dto.request.auth.SessionMetaRequest;
-import me.huynhducphu.PingMe_Backend.dto.response.auth.SessionMetaResponse;
+import me.huynhducphu.PingMe_Backend.dto.response.auth.UserDeviceMetaResponse;
 
 import java.time.Duration;
 import java.util.List;
@@ -21,6 +21,6 @@ public interface RefreshTokenRedisService {
 
     void deleteRefreshToken(String key);
 
-    List<SessionMetaResponse> getAllSessionMetas(String userId, String currentRefreshToken);
+    List<UserDeviceMetaResponse> getAllDeviceMetas(String userId, String currentRefreshToken);
 
 }

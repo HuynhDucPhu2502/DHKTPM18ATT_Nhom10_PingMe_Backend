@@ -2,8 +2,8 @@ package me.huynhducphu.PingMe_Backend.service.integration.impl;
 
 import lombok.RequiredArgsConstructor;
 import me.huynhducphu.PingMe_Backend.dto.request.auth.SessionMetaRequest;
-import me.huynhducphu.PingMe_Backend.dto.response.auth.SessionMetaResponse;
-import me.huynhducphu.PingMe_Backend.model.common.SessionMeta;
+import me.huynhducphu.PingMe_Backend.dto.response.auth.UserDeviceMetaResponse;
+import me.huynhducphu.PingMe_Backend.model.common.DeviceMeta;
 import me.huynhducphu.PingMe_Backend.service.integration.RefreshTokenRedisService;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.modelmapper.ModelMapper;
@@ -24,7 +24,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class RefreshTokenRedisServiceImpl implements RefreshTokenRedisService {
 
-    private final RedisTemplate<String, SessionMeta> redisSessionMetaTemplate;
+    private final RedisTemplate<String, DeviceMeta> redisSessionMetaTemplate;
     private final ModelMapper modelMapper;
 
     @Override
@@ -34,7 +34,7 @@ public class RefreshTokenRedisServiceImpl implements RefreshTokenRedisService {
     ) {
         String sessionId = buildKey(token, userId);
 
-        SessionMeta sessionMeta = new SessionMeta(
+        DeviceMeta deviceMeta = new DeviceMeta(
                 sessionId,
                 sessionMetaRequest.getDeviceType(),
                 sessionMetaRequest.getBrowser(),
@@ -42,26 +42,26 @@ public class RefreshTokenRedisServiceImpl implements RefreshTokenRedisService {
                 Instant.now().toString()
         );
 
-        redisSessionMetaTemplate.opsForValue().set(sessionId, sessionMeta, expire);
+        redisSessionMetaTemplate.opsForValue().set(sessionId, deviceMeta, expire);
     }
 
     @Override
-    public List<SessionMetaResponse> getAllSessionMetas(String userId, String currentRefreshToken) {
+    public List<UserDeviceMetaResponse> getAllDeviceMetas(String userId, String currentRefreshToken) {
         String keyPattern = "auth::refresh_token:" + userId + ":*";
         Set<String> keys = redisSessionMetaTemplate.keys(keyPattern);
 
         if (keys == null || keys.isEmpty()) return Collections.emptyList();
         String currentTokenHash = DigestUtils.sha256Hex(currentRefreshToken);
 
-        List<SessionMetaResponse> sessionMetas = new ArrayList<>();
+        List<UserDeviceMetaResponse> sessionMetas = new ArrayList<>();
         for (String key : keys) {
-            SessionMeta meta = redisSessionMetaTemplate.opsForValue().get(key);
+            DeviceMeta meta = redisSessionMetaTemplate.opsForValue().get(key);
             if (meta == null) continue;
 
             String keyHash = key.substring(key.lastIndexOf(":") + 1);
             boolean isCurrent = currentTokenHash.equals(keyHash);
 
-            var sessionMetaResponse = modelMapper.map(meta, SessionMetaResponse.class);
+            var sessionMetaResponse = modelMapper.map(meta, UserDeviceMetaResponse.class);
             sessionMetaResponse.setCurrent(isCurrent);
 
             sessionMetas.add(sessionMetaResponse);

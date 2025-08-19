@@ -1,4 +1,4 @@
-package me.huynhducphu.PingMe_Backend.service.common;
+package me.huynhducphu.PingMe_Backend.service.admin;
 
 import me.huynhducphu.PingMe_Backend.dto.request.user.CreateUserRequest;
 import me.huynhducphu.PingMe_Backend.dto.response.user.DefaultUserResponse;

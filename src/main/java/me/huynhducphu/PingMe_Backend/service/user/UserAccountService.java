@@ -1,8 +1,8 @@
-package me.huynhducphu.PingMe_Backend.service.account;
+package me.huynhducphu.PingMe_Backend.service.user;
 
 import me.huynhducphu.PingMe_Backend.dto.request.auth.*;
 import me.huynhducphu.PingMe_Backend.dto.common.AuthResultWrapper;
-import me.huynhducphu.PingMe_Backend.dto.response.auth.SessionMetaResponse;
+import me.huynhducphu.PingMe_Backend.dto.response.auth.UserDeviceMetaResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.UserInfoResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.UserSessionResponse;
 import org.springframework.http.ResponseCookie;
@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Admin 8/4/2025
  **/
-public interface AccountManagementService {
+public interface UserAccountService {
     UserSessionResponse register(
             RegisterRequest registerRequest);
 
@@ -23,13 +23,13 @@ public interface AccountManagementService {
 
     AuthResultWrapper refreshSession(String refreshToken, SessionMetaRequest sessionMetaRequest);
 
-    void deleteCurrentUserSession(String sessionId);
+    void deleteCurrentUserDeviceMeta(String sessionId);
 
     UserSessionResponse getCurrentUserSession();
 
     UserInfoResponse getCurrentUserInfo();
 
-    List<SessionMetaResponse> getCurrentUserAllSessionMetas(
+    List<UserDeviceMetaResponse> getCurrentUserAllDeviceMetas(
             String refreshToken
     );
 

@@ -1,4 +1,4 @@
-package me.huynhducphu.PingMe_Backend.service.common.impl;
+package me.huynhducphu.PingMe_Backend.service.admin.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -7,7 +7,7 @@ import me.huynhducphu.PingMe_Backend.dto.response.user.DefaultUserResponse;
 import me.huynhducphu.PingMe_Backend.model.user.User;
 import me.huynhducphu.PingMe_Backend.model.constant.AuthProvider;
 import me.huynhducphu.PingMe_Backend.repository.UserRepository;
-import me.huynhducphu.PingMe_Backend.service.common.UserService;
+import me.huynhducphu.PingMe_Backend.service.admin.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
