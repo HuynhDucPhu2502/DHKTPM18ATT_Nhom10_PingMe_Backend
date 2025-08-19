@@ -1,4 +1,4 @@
-package me.huynhducphu.PingMe_Backend.service;
+package me.huynhducphu.PingMe_Backend.service.account;
 
 import me.huynhducphu.PingMe_Backend.dto.request.auth.*;
 import me.huynhducphu.PingMe_Backend.dto.common.AuthResultWrapper;
@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Admin 8/4/2025
  **/
-public interface AuthService {
+public interface AccountManagementService {
     UserSessionResponse register(
             RegisterRequest registerRequest);
 

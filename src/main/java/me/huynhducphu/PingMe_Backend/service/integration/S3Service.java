@@ -1,4 +1,4 @@
-package me.huynhducphu.PingMe_Backend.service;
+package me.huynhducphu.PingMe_Backend.service.integration;
 
 import org.springframework.web.multipart.MultipartFile;
 

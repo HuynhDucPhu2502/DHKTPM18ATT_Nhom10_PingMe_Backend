@@ -1,9 +1,10 @@
-package me.huynhducphu.PingMe_Backend.service.impl;
+package me.huynhducphu.PingMe_Backend.service.integration.impl;
 
 import lombok.RequiredArgsConstructor;
 import me.huynhducphu.PingMe_Backend.dto.request.auth.SessionMetaRequest;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.SessionMetaResponse;
 import me.huynhducphu.PingMe_Backend.model.common.SessionMeta;
+import me.huynhducphu.PingMe_Backend.service.integration.RefreshTokenRedisService;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -21,7 +22,7 @@ import java.util.Set;
  **/
 @Service
 @RequiredArgsConstructor
-public class RefreshTokenRedisServiceImpl implements me.huynhducphu.PingMe_Backend.service.RefreshTokenRedisService {
+public class RefreshTokenRedisServiceImpl implements RefreshTokenRedisService {
 
     private final RedisTemplate<String, SessionMeta> redisSessionMetaTemplate;
     private final ModelMapper modelMapper;

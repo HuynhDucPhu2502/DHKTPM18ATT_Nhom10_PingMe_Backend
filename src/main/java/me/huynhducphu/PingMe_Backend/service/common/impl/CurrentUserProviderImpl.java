@@ -1,9 +1,10 @@
-package me.huynhducphu.PingMe_Backend.service.impl;
+package me.huynhducphu.PingMe_Backend.service.common.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import me.huynhducphu.PingMe_Backend.model.user.User;
 import me.huynhducphu.PingMe_Backend.repository.UserRepository;
+import me.huynhducphu.PingMe_Backend.service.common.CurrentUserProvider;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Component;
  **/
 @Component
 @RequiredArgsConstructor
-public class CurrentUserProviderImpl implements me.huynhducphu.PingMe_Backend.service.CurrentUserProvider {
+public class CurrentUserProviderImpl implements CurrentUserProvider {
     private final UserRepository userRepository;
 
     @Override

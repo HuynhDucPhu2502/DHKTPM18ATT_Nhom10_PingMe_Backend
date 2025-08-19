@@ -1,4 +1,4 @@
-package me.huynhducphu.PingMe_Backend.service.impl;
+package me.huynhducphu.PingMe_Backend.service.account.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -11,10 +11,11 @@ import me.huynhducphu.PingMe_Backend.dto.response.auth.UserSessionResponse;
 import me.huynhducphu.PingMe_Backend.model.user.User;
 import me.huynhducphu.PingMe_Backend.model.constant.AuthProvider;
 import me.huynhducphu.PingMe_Backend.repository.UserRepository;
-import me.huynhducphu.PingMe_Backend.service.CurrentUserProvider;
-import me.huynhducphu.PingMe_Backend.service.JwtService;
-import me.huynhducphu.PingMe_Backend.service.RefreshTokenRedisService;
-import me.huynhducphu.PingMe_Backend.service.S3Service;
+import me.huynhducphu.PingMe_Backend.service.account.AccountManagementService;
+import me.huynhducphu.PingMe_Backend.service.account.JwtService;
+import me.huynhducphu.PingMe_Backend.service.common.CurrentUserProvider;
+import me.huynhducphu.PingMe_Backend.service.integration.RefreshTokenRedisService;
+import me.huynhducphu.PingMe_Backend.service.integration.S3Service;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -40,7 +41,7 @@ import java.util.List;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 @Transactional
-public class AuthServiceImpl implements me.huynhducphu.PingMe_Backend.service.AuthService {
+public class AccountManagementServiceImpl implements AccountManagementService {
 
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;

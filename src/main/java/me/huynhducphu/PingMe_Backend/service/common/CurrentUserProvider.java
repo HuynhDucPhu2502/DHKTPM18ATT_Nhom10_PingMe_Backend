@@ -1,4 +1,4 @@
-package me.huynhducphu.PingMe_Backend.service;
+package me.huynhducphu.PingMe_Backend.service.common;
 
 import me.huynhducphu.PingMe_Backend.model.user.User;
 

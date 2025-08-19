@@ -6,7 +6,7 @@ import me.huynhducphu.PingMe_Backend.dto.request.user.CreateUserRequest;
 import me.huynhducphu.PingMe_Backend.dto.response.ApiResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.PageResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.user.DefaultUserResponse;
-import me.huynhducphu.PingMe_Backend.service.UserService;
+import me.huynhducphu.PingMe_Backend.service.common.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;

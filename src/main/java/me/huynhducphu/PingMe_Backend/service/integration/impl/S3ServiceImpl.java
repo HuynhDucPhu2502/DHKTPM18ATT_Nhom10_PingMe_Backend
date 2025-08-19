@@ -1,7 +1,8 @@
-package me.huynhducphu.PingMe_Backend.service.impl;
+package me.huynhducphu.PingMe_Backend.service.integration.impl;
 
 import lombok.RequiredArgsConstructor;
 import me.huynhducphu.PingMe_Backend.advice.exception.S3UploadException;
+import me.huynhducphu.PingMe_Backend.service.integration.S3Service;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -10,14 +11,12 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
-import java.io.IOException;
-
 /**
  * Admin 8/16/2025
  **/
 @Service
 @RequiredArgsConstructor
-public class S3ServiceImpl implements me.huynhducphu.PingMe_Backend.service.S3Service {
+public class S3ServiceImpl implements S3Service {
 
     private final S3Client s3Client;
 

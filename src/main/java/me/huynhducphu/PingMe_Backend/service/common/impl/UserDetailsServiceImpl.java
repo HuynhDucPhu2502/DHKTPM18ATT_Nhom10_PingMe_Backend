@@ -1,4 +1,4 @@
-package me.huynhducphu.PingMe_Backend.service.impl;
+package me.huynhducphu.PingMe_Backend.service.common.impl;
 
 import lombok.RequiredArgsConstructor;
 import me.huynhducphu.PingMe_Backend.repository.UserRepository;

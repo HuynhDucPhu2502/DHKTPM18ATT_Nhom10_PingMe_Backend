@@ -1,9 +1,10 @@
-package me.huynhducphu.PingMe_Backend.service.impl;
+package me.huynhducphu.PingMe_Backend.service.account.impl;
 
 import lombok.RequiredArgsConstructor;
 import me.huynhducphu.PingMe_Backend.config.auth.AuthConfiguration;
 import me.huynhducphu.PingMe_Backend.dto.response.auth.UserSessionResponse;
 import me.huynhducphu.PingMe_Backend.model.user.User;
+import me.huynhducphu.PingMe_Backend.service.account.JwtService;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Service;
@@ -16,7 +17,7 @@ import java.time.temporal.ChronoUnit;
  **/
 @Service
 @RequiredArgsConstructor
-public class JwtServiceImpl implements me.huynhducphu.PingMe_Backend.service.JwtService {
+public class JwtServiceImpl implements JwtService {
 
     private final ModelMapper modelMapper;
 
