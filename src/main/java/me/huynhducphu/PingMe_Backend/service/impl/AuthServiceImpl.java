@@ -11,6 +11,7 @@ import me.huynhducphu.PingMe_Backend.dto.response.auth.UserSessionResponse;
 import me.huynhducphu.PingMe_Backend.model.user.User;
 import me.huynhducphu.PingMe_Backend.model.constant.AuthProvider;
 import me.huynhducphu.PingMe_Backend.repository.UserRepository;
+import me.huynhducphu.PingMe_Backend.service.CurrentUserProvider;
 import me.huynhducphu.PingMe_Backend.service.JwtService;
 import me.huynhducphu.PingMe_Backend.service.RefreshTokenRedisService;
 import me.huynhducphu.PingMe_Backend.service.S3Service;
@@ -52,6 +53,8 @@ public class AuthServiceImpl implements me.huynhducphu.PingMe_Backend.service.Au
 
     private final UserRepository userRepository;
 
+    private final CurrentUserProvider currentUserProvider;
+
     private static final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
     private static final Long MAX_AVATAR_FILE_SIZE = 2 * 1024 * 1024L;
 
@@ -92,7 +95,7 @@ public class AuthServiceImpl implements me.huynhducphu.PingMe_Backend.service.Au
         var authentication = authenticationManager.authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        return buildAuthResultWrapper(getCurrentUser(), loginRequest.getSessionMetaRequest());
+        return buildAuthResultWrapper(currentUserProvider.get(), loginRequest.getSessionMetaRequest());
     }
 
     @Override
@@ -135,21 +138,21 @@ public class AuthServiceImpl implements me.huynhducphu.PingMe_Backend.service.Au
 
     @Override
     public UserSessionResponse getCurrentUserSession() {
-        var user = getCurrentUser();
+        var user = currentUserProvider.get();
         return modelMapper.map(user, UserSessionResponse.class);
     }
 
     @Override
     public UserDetailResponse getCurrentUserDetail() {
-        var user = getCurrentUser();
+        var user = currentUserProvider.get();
         return modelMapper.map(user, UserDetailResponse.class);
     }
 
     @Override
-    public List<SessionMetaResponse> getCurrentUserSessions(
+    public List<SessionMetaResponse> getCurrentUserAllSessionMetas(
             String refreshToken
     ) {
-        var currentUser = getCurrentUser();
+        var currentUser = currentUserProvider.get();
 
         String email = jwtService.decodeJwt(refreshToken).getSubject();
         var refreshTokenUser = userRepository
@@ -166,7 +169,7 @@ public class AuthServiceImpl implements me.huynhducphu.PingMe_Backend.service.Au
     public UserSessionResponse updateCurrentUserPassword(
             ChangePasswordRequest changePasswordRequest
     ) {
-        var user = getCurrentUser();
+        var user = currentUserProvider.get();
 
         if (!passwordEncoder.matches(changePasswordRequest.getOldPassword(), user.getPassword()))
             throw new DataIntegrityViolationException("Mật khẩu cũ không chính xác");
@@ -180,7 +183,7 @@ public class AuthServiceImpl implements me.huynhducphu.PingMe_Backend.service.Au
     public UserSessionResponse updateCurrentUserProfile(
             ChangeProfileRequest changeProfileRequest
     ) {
-        var user = getCurrentUser();
+        var user = currentUserProvider.get();
 
         user.setName(changeProfileRequest.getName());
         user.setGender(changeProfileRequest.getGender());
@@ -194,7 +197,7 @@ public class AuthServiceImpl implements me.huynhducphu.PingMe_Backend.service.Au
     public UserSessionResponse updateCurrentUserAvatar(
             MultipartFile avatarFile
     ) {
-        var user = getCurrentUser();
+        var user = currentUserProvider.get();
 
         String url = s3Service.uploadFile(
                 avatarFile,
@@ -215,7 +218,7 @@ public class AuthServiceImpl implements me.huynhducphu.PingMe_Backend.service.Au
         String[] part = sessionId.split(":");
         String sessionUserId = part[3];
 
-        var currentUser = getCurrentUser();
+        var currentUser = currentUserProvider.get();
 
         if (!currentUser.getId().toString().equals(sessionUserId))
             throw new AccessDeniedException("Không có quyền truy cập");
@@ -226,18 +229,6 @@ public class AuthServiceImpl implements me.huynhducphu.PingMe_Backend.service.Au
     // =====================================
     // Utilities methods
     // =====================================
-    @Override
-    public User getCurrentUser() {
-        String email = SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getName();
-
-        return userRepository
-                .getUserByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy người dùng hiện tại"));
-    }
-
     private AuthResultWrapper buildAuthResultWrapper(
             User user,
             SessionMetaRequest sessionMetaRequest

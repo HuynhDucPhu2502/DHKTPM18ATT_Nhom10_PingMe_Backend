@@ -91,7 +91,7 @@ public class AuthController {
     ) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ApiResponse<>(authService.getCurrentUserSessions(refreshToken)));
+                .body(new ApiResponse<>(authService.getCurrentUserAllSessionMetas(refreshToken)));
     }
 
     @PostMapping("/me/password")
