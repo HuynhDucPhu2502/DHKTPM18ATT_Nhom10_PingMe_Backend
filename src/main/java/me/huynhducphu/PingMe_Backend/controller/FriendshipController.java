@@ -23,20 +23,25 @@ public class FriendshipController {
     private final FriendshipService friendshipService;
 
     @PostMapping
-    public void sendInvitation(FriendInvitationRequest friendInvitationRequest) {
+    public void sendInvitation(@RequestBody FriendInvitationRequest friendInvitationRequest) {
         friendshipService.sendInvitation(friendInvitationRequest);
     }
 
-    @GetMapping("/{id}/accept")
+    @PostMapping("/{id}/accept")
     public void acceptInvitation(@PathVariable Long id) {
         friendshipService.acceptInvitation(id);
     }
 
-    @GetMapping("/{id}/reject")
+    @DeleteMapping("/{id}/reject")
     public void rejectInvitation(@PathVariable Long id) {
         friendshipService.rejectInvitation(id);
     }
 
+    @DeleteMapping("/{id}")
+    public void deleteFriendship(@PathVariable Long id) {
+        friendshipService.deleteFriendship(id);
+    }
+    
     @GetMapping
     public ResponseEntity<ApiResponse<PageResponse<UserSummaryResponse>>> getAcceptedFriendshipList(
             @PageableDefault(size = 5) Pageable pageable

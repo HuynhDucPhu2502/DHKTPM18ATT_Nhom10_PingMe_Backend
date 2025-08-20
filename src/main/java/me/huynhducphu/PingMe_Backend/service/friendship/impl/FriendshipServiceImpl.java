@@ -95,6 +95,25 @@ public class FriendshipServiceImpl implements me.huynhducphu.PingMe_Backend.serv
     }
 
     @Override
+    public void deleteFriendship(Long friendRequestId) {
+        var current = currentUserProvider.get();
+
+        var friendship = friendshipRepository
+                .findById(friendRequestId)
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy mối quan hệ"));
+
+        if (friendship.getFriendshipStatus() != FriendshipStatus.ACCEPTED)
+            throw new DataIntegrityViolationException("Trạng thái lời mời không thích hợp");
+
+        var isParticipant = friendship.getUserA().getId().equals(current.getId())
+                || friendship.getUserB().getId().equals(current.getId());
+        if (!isParticipant)
+            throw new DataIntegrityViolationException("Chỉ có người trong mối quan hệ này mới có thể xóa");
+
+        friendshipRepository.delete(friendship);
+    }
+
+    @Override
     public Page<UserSummaryResponse> getAcceptedFriendshipList(Pageable pageable) {
         var currentUser = currentUserProvider.get();
 
@@ -108,7 +127,10 @@ public class FriendshipServiceImpl implements me.huynhducphu.PingMe_Backend.serv
                     var friend = friendship.getUserA().getId().equals(currentUser.getId())
                             ? friendship.getUserB()
                             : friendship.getUserA();
-                    return modelMapper.map(friend, UserSummaryResponse.class);
+                    var userSummaryResponse = modelMapper.map(friend, UserSummaryResponse.class);
+                    var friendshipSummary = modelMapper.map(friendship, UserSummaryResponse.FriendshipSummary.class);
+                    userSummaryResponse.setFriendshipSummary(friendshipSummary);
+                    return modelMapper.map(userSummaryResponse, UserSummaryResponse.class);
                 });
     }
 
@@ -121,8 +143,12 @@ public class FriendshipServiceImpl implements me.huynhducphu.PingMe_Backend.serv
                         FriendshipStatus.PENDING, currentUser.getId(), pageable
                 )
                 .map(friendship -> {
-                    var inviter = friendship.getUserA();
-                    return modelMapper.map(inviter, UserSummaryResponse.class);
+                    System.out.println(friendship);
+                    var invitee = friendship.getUserA();
+                    var userSummaryResponse = modelMapper.map(invitee, UserSummaryResponse.class);
+                    var friendshipSummary = modelMapper.map(friendship, UserSummaryResponse.FriendshipSummary.class);
+                    userSummaryResponse.setFriendshipSummary(friendshipSummary);
+                    return userSummaryResponse;
                 });
     }
 
@@ -135,8 +161,12 @@ public class FriendshipServiceImpl implements me.huynhducphu.PingMe_Backend.serv
                         FriendshipStatus.PENDING, currentUser.getId(), pageable
                 )
                 .map(friendship -> {
+                    System.out.println(friendship);
                     var invitee = friendship.getUserB();
-                    return modelMapper.map(invitee, UserSummaryResponse.class);
+                    var userSummaryResponse = modelMapper.map(invitee, UserSummaryResponse.class);
+                    var friendshipSummary = modelMapper.map(friendship, UserSummaryResponse.FriendshipSummary.class);
+                    userSummaryResponse.setFriendshipSummary(friendshipSummary);
+                    return userSummaryResponse;
                 });
     }
 
