@@ -2,7 +2,6 @@ package me.huynhducphu.PingMe_Backend.service.user_lookup.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import me.huynhducphu.PingMe_Backend.dto.request.user_lookup.DefaultUserLookupRequest;
 import me.huynhducphu.PingMe_Backend.dto.response.common.UserSummaryResponse;
 import me.huynhducphu.PingMe_Backend.repository.FriendshipRepository;
 import me.huynhducphu.PingMe_Backend.repository.UserRepository;
@@ -25,12 +24,14 @@ public class UserLookupServiceImpl implements me.huynhducphu.PingMe_Backend.serv
     private final ModelMapper modelMapper;
 
     @Override
-    public UserSummaryResponse lookupUser(DefaultUserLookupRequest defaultUserLookupRequest) {
+    public UserSummaryResponse lookupUser(String email) {
         var currentUser = currentUserProvider.get();
 
         var targetUser = userRepository
-                .getUserByEmail(defaultUserLookupRequest.getEmail())
-                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy người dùng"));
+                .getUserByEmail(email)
+                .orElse(null);
+
+        if (targetUser == null) return null;
 
         if (targetUser.getId().equals(currentUser.getId()))
             throw new EntityNotFoundException("Bạn không thể tìm chính mình");
