@@ -4,17 +4,21 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import me.huynhducphu.PingMe_Backend.dto.request.friendship.FriendInvitationRequest;
 import me.huynhducphu.PingMe_Backend.dto.response.common.UserSummaryResponse;
+import me.huynhducphu.PingMe_Backend.dto.ws.FriendshipEvent;
 import me.huynhducphu.PingMe_Backend.model.constant.FriendshipStatus;
 import me.huynhducphu.PingMe_Backend.model.Friendship;
 import me.huynhducphu.PingMe_Backend.repository.FriendshipRepository;
 import me.huynhducphu.PingMe_Backend.repository.UserRepository;
 import me.huynhducphu.PingMe_Backend.service.common.CurrentUserProvider;
 import org.modelmapper.ModelMapper;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Instant;
 
 /**
  * Admin 8/19/2025
@@ -30,6 +34,8 @@ public class FriendshipServiceImpl implements me.huynhducphu.PingMe_Backend.serv
     private final CurrentUserProvider currentUserProvider;
 
     private final ModelMapper modelMapper;
+
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public void sendInvitation(FriendInvitationRequest friendInvitationRequest) {
@@ -56,6 +62,13 @@ public class FriendshipServiceImpl implements me.huynhducphu.PingMe_Backend.serv
         friendship.setUserHighId(highId);
 
         friendshipRepository.save(friendship);
+
+        eventPublisher.publishEvent(new FriendshipEvent(
+                FriendshipEvent.Type.INVITED,
+                friendship.getId(),
+                currentUser.getId(),
+                targetUser.getId()
+        ));
     }
 
     @Override
@@ -160,7 +173,6 @@ public class FriendshipServiceImpl implements me.huynhducphu.PingMe_Backend.serv
                         FriendshipStatus.PENDING, currentUser.getId(), pageable
                 )
                 .map(friendship -> {
-                    System.out.println(friendship);
                     var invitee = friendship.getUserA();
                     var userSummaryResponse = modelMapper.map(invitee, UserSummaryResponse.class);
                     var friendshipSummary = modelMapper.map(friendship, UserSummaryResponse.FriendshipSummary.class);
@@ -178,7 +190,6 @@ public class FriendshipServiceImpl implements me.huynhducphu.PingMe_Backend.serv
                         FriendshipStatus.PENDING, currentUser.getId(), pageable
                 )
                 .map(friendship -> {
-                    System.out.println(friendship);
                     var invitee = friendship.getUserB();
                     var userSummaryResponse = modelMapper.map(invitee, UserSummaryResponse.class);
                     var friendshipSummary = modelMapper.map(friendship, UserSummaryResponse.FriendshipSummary.class);
