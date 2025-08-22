@@ -73,7 +73,7 @@ public class FriendshipServiceImpl implements me.huynhducphu.PingMe_Backend.serv
 
     @Override
     public void acceptInvitation(Long friendRequestId) {
-        var current = currentUserProvider.get();
+        var currentUser = currentUserProvider.get();
 
         var friendship = friendshipRepository
                 .findById(friendRequestId)
@@ -82,15 +82,22 @@ public class FriendshipServiceImpl implements me.huynhducphu.PingMe_Backend.serv
         if (friendship.getFriendshipStatus() != FriendshipStatus.PENDING)
             throw new DataIntegrityViolationException("Trạng thái lời mời không thích hợp");
 
-        if (!friendship.getUserB().getId().equals(current.getId()))
+        if (!friendship.getUserB().getId().equals(currentUser.getId()))
             throw new DataIntegrityViolationException("Chỉ có người được nhận lời mời mới có thể chấp nhận");
 
         friendship.setFriendshipStatus(FriendshipStatus.ACCEPTED);
+
+        eventPublisher.publishEvent(new FriendshipEvent(
+                FriendshipEvent.Type.ACCEPTED,
+                friendship.getId(),
+                currentUser.getId(),
+                friendship.getUserA().getId()
+        ));
     }
 
     @Override
     public void rejectInvitation(Long friendRequestId) {
-        var current = currentUserProvider.get();
+        var currentUser = currentUserProvider.get();
 
         var friendship = friendshipRepository
                 .findById(friendRequestId)
@@ -99,16 +106,23 @@ public class FriendshipServiceImpl implements me.huynhducphu.PingMe_Backend.serv
         if (friendship.getFriendshipStatus() != FriendshipStatus.PENDING)
             throw new DataIntegrityViolationException("Trạng thái lời mời không thích hợp");
 
-        var isParticipant = friendship.getUserB().getId().equals(current.getId());
+        var isParticipant = friendship.getUserB().getId().equals(currentUser.getId());
         if (!isParticipant)
             throw new DataIntegrityViolationException("Chỉ có người được nhận lời mời mới có thể hủy");
 
         friendshipRepository.delete(friendship);
+
+        eventPublisher.publishEvent(new FriendshipEvent(
+                FriendshipEvent.Type.REJECTED,
+                friendship.getId(),
+                currentUser.getId(),
+                friendship.getUserA().getId()
+        ));
     }
 
     @Override
     public void cancelInvitation(Long friendRequestId) {
-        var current = currentUserProvider.get();
+        var currentUser = currentUserProvider.get();
 
         var friendship = friendshipRepository
                 .findById(friendRequestId)
@@ -117,16 +131,23 @@ public class FriendshipServiceImpl implements me.huynhducphu.PingMe_Backend.serv
         if (friendship.getFriendshipStatus() != FriendshipStatus.PENDING)
             throw new DataIntegrityViolationException("Trạng thái lời mời không thích hợp");
 
-        var isParticipant = friendship.getUserA().getId().equals(current.getId());
+        var isParticipant = friendship.getUserA().getId().equals(currentUser.getId());
         if (!isParticipant)
             throw new DataIntegrityViolationException("Chỉ có người được gửi lời mời mới có thể thu hồi");
 
         friendshipRepository.delete(friendship);
+
+        eventPublisher.publishEvent(new FriendshipEvent(
+                FriendshipEvent.Type.CANCELED,
+                friendship.getId(),
+                currentUser.getId(),
+                friendship.getUserB().getId()
+        ));
     }
 
     @Override
     public void deleteFriendship(Long friendRequestId) {
-        var current = currentUserProvider.get();
+        var currentUser = currentUserProvider.get();
 
         var friendship = friendshipRepository
                 .findById(friendRequestId)
@@ -135,12 +156,20 @@ public class FriendshipServiceImpl implements me.huynhducphu.PingMe_Backend.serv
         if (friendship.getFriendshipStatus() != FriendshipStatus.ACCEPTED)
             throw new DataIntegrityViolationException("Trạng thái lời mời không thích hợp");
 
-        var isParticipant = friendship.getUserA().getId().equals(current.getId())
-                || friendship.getUserB().getId().equals(current.getId());
+        var isParticipant = friendship.getUserA().getId().equals(currentUser.getId())
+                || friendship.getUserB().getId().equals(currentUser.getId());
         if (!isParticipant)
             throw new DataIntegrityViolationException("Chỉ có người trong mối quan hệ này mới có thể xóa");
 
         friendshipRepository.delete(friendship);
+
+        var isUserA = friendship.getUserA().getId().equals(currentUser.getId());
+        eventPublisher.publishEvent(new FriendshipEvent(
+                FriendshipEvent.Type.DELETED,
+                friendship.getId(),
+                currentUser.getId(),
+                isUserA ? friendship.getUserB().getId() : friendship.getUserA().getId()
+        ));
     }
 
     @Override
