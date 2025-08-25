@@ -1,0 +1,34 @@
+package me.huynhducphu.PingMe_Backend.dto.response.chat;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+/**
+ * Admin 8/25/2025
+ *
+ **/
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+public class RoomResponse {
+    private Long roomId;
+    private String roomType;
+    private String directKey;
+    private String name;
+    private LastMessage lastMessage;
+    private List<RoomParticipantResponse> participants;
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Data
+    public static class LastMessage {
+        private Long messageId;
+        private Long senderId;
+        private String preview;
+        private LocalDateTime createdAt;
+    }
+}
