@@ -38,7 +38,7 @@ public class Room extends BaseEntity {
     private String name;
     // ROOM NAME (nếu chat 1-1 thì NULL)
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "last_message_id")
     private Message lastMessage;
 
