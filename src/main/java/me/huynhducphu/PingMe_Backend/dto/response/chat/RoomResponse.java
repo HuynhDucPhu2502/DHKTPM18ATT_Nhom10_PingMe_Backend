@@ -3,6 +3,7 @@ package me.huynhducphu.PingMe_Backend.dto.response.chat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import me.huynhducphu.PingMe_Backend.model.constant.RoomType;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,7 +17,7 @@ import java.util.List;
 @Data
 public class RoomResponse {
     private Long roomId;
-    private String roomType;
+    private RoomType roomType;
     private String directKey;
     private String name;
     private LastMessage lastMessage;
