@@ -13,7 +13,7 @@ import java.util.List;
  **/
 @Repository
 public interface RoomParticipantRepository extends JpaRepository<RoomParticipant, RoomMemberId> {
-    List<RoomParticipant> findByRoomId(Long roomId);
+    List<RoomParticipant> findByRoom_Id(Long roomId);
 
     boolean existsByRoom_IdAndUser_Id(Long roomId, Long userId);
 }
