@@ -22,6 +22,7 @@ public class RoomResponse {
     private String name;
     private LastMessage lastMessage;
     private List<RoomParticipantResponse> participants;
+    private long unreadCount;
 
     @AllArgsConstructor
     @NoArgsConstructor
