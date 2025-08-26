@@ -15,10 +15,15 @@ import me.huynhducphu.PingMe_Backend.repository.RoomRepository;
 import me.huynhducphu.PingMe_Backend.repository.UserRepository;
 import me.huynhducphu.PingMe_Backend.service.common.CurrentUserProvider;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Admin 8/25/2025
@@ -51,7 +56,7 @@ public class RoomServiceImpl implements me.huynhducphu.PingMe_Backend.service.ch
 
         if (room != null) {
             ensureParticipants(room, currentUser.getId(), createOrGetDirectRoomRequest.getTargetUserId());
-            return toResponse(room, roomParticipantRepository.findByRoom_Id(room.getId()));
+            return toResponse(room, roomParticipantRepository.findByRoom_Id(room.getId()), currentUser.getId());
         }
 
         try {
@@ -68,14 +73,41 @@ public class RoomServiceImpl implements me.huynhducphu.PingMe_Backend.service.ch
             addParticipant(savedRoom, currentUser.getId());
             addParticipant(savedRoom, createOrGetDirectRoomRequest.getTargetUserId());
 
-            return toResponse(savedRoom, roomParticipantRepository.findByRoom_Id(savedRoom.getId()));
+            return toResponse(savedRoom, roomParticipantRepository.findByRoom_Id(savedRoom.getId()), currentUser.getId());
         } catch (DataIntegrityViolationException ex) {
             Room existed = roomRepository.findByDirectKey(directKey).orElseThrow(() -> ex);
             ensureParticipants(existed, currentUser.getId(), createOrGetDirectRoomRequest.getTargetUserId());
-            return toResponse(existed, roomParticipantRepository.findByRoom_Id(existed.getId()));
+            return toResponse(existed, roomParticipantRepository.findByRoom_Id(existed.getId()), currentUser.getId());
         }
     }
 
+    @Override
+    public Page<RoomResponse> getCurrentUserRooms(Pageable pageable) {
+        var currentUser = currentUserProvider.get();
+        var currentUserId = currentUser.getId();
+
+        Page<Room> page = roomRepository.findAllByMember(currentUserId, pageable);
+
+        if (page.isEmpty()) return Page.empty(pageable);
+
+        List<Long> roomIds = page.getContent().stream().map(Room::getId).toList();
+        Map<Long, List<RoomParticipant>> participantsByRoom = roomParticipantRepository
+                .findByRoom_IdIn(roomIds)
+                .stream()
+                .collect(Collectors.groupingBy(rp -> rp.getRoom().getId()));
+
+
+        List<RoomResponse> content = page
+                .getContent()
+                .stream()
+                .map(room -> {
+                    var members = participantsByRoom.getOrDefault(room.getId(), List.of());
+                    return toResponse(room, members, currentUserId);
+                })
+                .toList();
+
+        return new PageImpl<>(content, pageable, page.getTotalElements());
+    }
 
     // =====================================
     // Utilities methods
@@ -108,7 +140,7 @@ public class RoomServiceImpl implements me.huynhducphu.PingMe_Backend.service.ch
         }
     }
 
-    private RoomResponse toResponse(Room room, List<RoomParticipant> members) {
+    private RoomResponse toResponse(Room room, List<RoomParticipant> members, Long userId) {
         List<RoomParticipantResponse> roomParticipantResponses = members
                 .stream()
                 .map(rp -> new RoomParticipantResponse(
@@ -118,6 +150,20 @@ public class RoomServiceImpl implements me.huynhducphu.PingMe_Backend.service.ch
                         rp.getLastReadAt()
                 ))
                 .toList();
+
+        Long currentUserLastReadIdMessage = members.stream()
+                .filter(rp -> rp.getUser().getId().equals(userId))
+                .map(RoomParticipant::getLastReadMessageId)
+                .findFirst()
+                .orElse(null);
+
+        long unread = 0;
+        if (room.getLastMessage() != null) {
+            long lastMsgId = room.getLastMessage().getId();
+            unread = (currentUserLastReadIdMessage == null)
+                    ? lastMsgId
+                    : Math.max(0, lastMsgId - currentUserLastReadIdMessage);
+        }
 
         RoomResponse.LastMessage lastMessage = null;
         if (room.getLastMessage() != null) {
@@ -137,6 +183,7 @@ public class RoomServiceImpl implements me.huynhducphu.PingMe_Backend.service.ch
         res.setName(room.getName());
         res.setLastMessage(lastMessage);
         res.setParticipants(roomParticipantResponses);
+        res.setUnreadCount(unread);
         return res;
     }
 
