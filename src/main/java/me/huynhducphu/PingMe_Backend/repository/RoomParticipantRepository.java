@@ -15,5 +15,5 @@ import java.util.List;
 public interface RoomParticipantRepository extends JpaRepository<RoomParticipant, RoomMemberId> {
     List<RoomParticipant> findByRoom_Id(Long roomId);
 
-    boolean existsByRoom_IdAndUser_Id(Long roomId, Long userId);
+    List<RoomParticipant> findByRoom_IdIn(List<Long> roomIds);
 }
