@@ -1,4 +1,4 @@
-package me.huynhducphu.PingMe_Backend.dto.response.chat;
+package me.huynhducphu.PingMe_Backend.dto.response.chat.message;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,7 +21,7 @@ public class MessageResponse {
     private String clientMsgId;
 
     private Long senderId;
-    
+
     private String content;
     private MessageType type;
     private LocalDateTime createdAt;

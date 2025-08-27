@@ -1,4 +1,4 @@
-package me.huynhducphu.PingMe_Backend.dto.request.chat;
+package me.huynhducphu.PingMe_Backend.dto.request.chat.message;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

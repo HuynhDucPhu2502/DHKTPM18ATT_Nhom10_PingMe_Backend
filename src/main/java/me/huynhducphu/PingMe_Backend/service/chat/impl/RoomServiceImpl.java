@@ -1,9 +1,9 @@
 package me.huynhducphu.PingMe_Backend.service.chat.impl;
 
 import lombok.RequiredArgsConstructor;
-import me.huynhducphu.PingMe_Backend.dto.request.chat.CreateOrGetDirectRoomRequest;
-import me.huynhducphu.PingMe_Backend.dto.response.chat.RoomParticipantResponse;
-import me.huynhducphu.PingMe_Backend.dto.response.chat.RoomResponse;
+import me.huynhducphu.PingMe_Backend.dto.request.chat.room.CreateOrGetDirectRoomRequest;
+import me.huynhducphu.PingMe_Backend.dto.response.chat.room.RoomParticipantResponse;
+import me.huynhducphu.PingMe_Backend.dto.response.chat.room.RoomResponse;
 import me.huynhducphu.PingMe_Backend.model.Message;
 import me.huynhducphu.PingMe_Backend.model.Room;
 import me.huynhducphu.PingMe_Backend.model.RoomParticipant;

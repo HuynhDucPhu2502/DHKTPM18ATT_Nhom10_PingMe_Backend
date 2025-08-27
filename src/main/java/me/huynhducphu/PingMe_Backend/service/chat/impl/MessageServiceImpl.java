@@ -2,10 +2,10 @@ package me.huynhducphu.PingMe_Backend.service.chat.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import me.huynhducphu.PingMe_Backend.dto.request.chat.MarkReadRequest;
-import me.huynhducphu.PingMe_Backend.dto.response.chat.ReadStateResponse;
-import me.huynhducphu.PingMe_Backend.dto.request.chat.SendMessageRequest;
-import me.huynhducphu.PingMe_Backend.dto.response.chat.MessageResponse;
+import me.huynhducphu.PingMe_Backend.dto.request.chat.message.MarkReadRequest;
+import me.huynhducphu.PingMe_Backend.dto.response.chat.message.ReadStateResponse;
+import me.huynhducphu.PingMe_Backend.dto.request.chat.message.SendMessageRequest;
+import me.huynhducphu.PingMe_Backend.dto.response.chat.message.MessageResponse;
 import me.huynhducphu.PingMe_Backend.model.Message;
 import me.huynhducphu.PingMe_Backend.model.Room;
 import me.huynhducphu.PingMe_Backend.model.RoomParticipant;

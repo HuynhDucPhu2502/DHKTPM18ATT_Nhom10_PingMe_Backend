@@ -1,22 +1,22 @@
-package me.huynhducphu.PingMe_Backend.dto.response.chat;
+package me.huynhducphu.PingMe_Backend.dto.response.chat.message;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import me.huynhducphu.PingMe_Backend.model.constant.RoomRole;
 
 import java.time.LocalDateTime;
 
 /**
- * Admin 8/25/2025
+ * Admin 8/26/2025
  *
  **/
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
-public class RoomParticipantResponse {
+public class ReadStateResponse {
+    private Long roomId;
     private Long userId;
-    private RoomRole role;
     private Long lastReadMessageId;
     private LocalDateTime lastReadAt;
+    private long unreadCount;
 }
