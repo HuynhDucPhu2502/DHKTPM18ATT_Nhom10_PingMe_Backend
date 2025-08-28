@@ -4,8 +4,11 @@ import me.huynhducphu.PingMe_Backend.model.Message;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -16,10 +19,15 @@ import java.util.UUID;
 @Repository
 public interface MessageRepository extends JpaRepository<Message, Long> {
 
-    Page<Message> findByRoom_IdOrderByIdDesc(Long roomId, Pageable pageable);
-
     Optional<Message> findByRoom_IdAndSender_IdAndClientMsgId(Long roomId, Long senderId, UUID clientMsgId);
 
-    Optional<Message> findTopByRoom_IdOrderByIdDesc(Long roomId);
-
+    @Query("""
+            select m from Message m
+            where m.room.id = :roomId
+              and (:beforeId is null or m.id < :beforeId)
+            order by m.id desc
+            """)
+    List<Message> findHistoryMessagesByKeySet(@Param("roomId") Long roomId,
+                                              @Param("beforeId") Long beforeId,
+                                              Pageable pageable);
 }

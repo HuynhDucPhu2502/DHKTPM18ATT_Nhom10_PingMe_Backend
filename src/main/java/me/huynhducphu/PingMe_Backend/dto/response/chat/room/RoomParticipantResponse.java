@@ -16,6 +16,8 @@ import java.time.LocalDateTime;
 @Data
 public class RoomParticipantResponse {
     private Long userId;
+    private String name;
+    private String avatarUrl;
     private RoomRole role;
     private Long lastReadMessageId;
     private LocalDateTime lastReadAt;

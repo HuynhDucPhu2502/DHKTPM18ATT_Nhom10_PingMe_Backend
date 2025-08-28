@@ -17,12 +17,15 @@ import me.huynhducphu.PingMe_Backend.repository.RoomRepository;
 import me.huynhducphu.PingMe_Backend.repository.UserRepository;
 import me.huynhducphu.PingMe_Backend.service.common.CurrentUserProvider;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URI;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -133,6 +136,35 @@ public class MessageServiceImpl implements me.huynhducphu.PingMe_Backend.service
         }
 
         return new ReadStateResponse(roomId, userId, newPointer, roomParticipant.getLastReadAt(), unread);
+    }
+
+    @Override
+    public List<MessageResponse> getHistoryMessages(
+            Long roomId,
+            Long beforeId,
+            Integer size
+    ) {
+        if (roomId == null || size == null)
+            throw new IllegalArgumentException("Mã phòng hoặc số lượng tin nhắn yêu cầu không hợp lệ");
+
+        var currentUser = currentUserProvider.get();
+        var userId = currentUser.getId();
+        
+        roomRepository
+                .findById(roomId)
+                .orElseThrow(() -> new EntityNotFoundException("Phòng chat này không tồn tại"));
+        var roomMemberId = new RoomMemberId(roomId, userId);
+        if (!roomParticipantRepository.existsById(roomMemberId))
+            throw new AccessDeniedException("Bạn không phải thành viên của phòng chat này");
+
+        int fixedSize = Math.max(1, Math.min(size, 20));
+        Pageable limit = PageRequest.of(0, fixedSize);
+
+        return messageRepository
+                .findHistoryMessagesByKeySet(roomId, beforeId, limit)
+                .stream()
+                .map(this::toDto)
+                .toList();
     }
 
     // =====================================

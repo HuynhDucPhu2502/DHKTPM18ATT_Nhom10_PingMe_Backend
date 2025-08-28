@@ -9,12 +9,13 @@ import me.huynhducphu.PingMe_Backend.dto.response.ApiResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.chat.message.MessageResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.chat.message.ReadStateResponse;
 import me.huynhducphu.PingMe_Backend.service.chat.MessageService;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * Admin 8/26/2025
@@ -41,7 +42,7 @@ public class MessageController {
     }
 
     @PostMapping("/read")
-    public ResponseEntity<ApiResponse<ReadStateResponse>> sendMessage(
+    public ResponseEntity<ApiResponse<ReadStateResponse>> markAsRead(
             @RequestBody @Valid MarkReadRequest markReadRequest
     ) {
         return ResponseEntity
@@ -49,5 +50,15 @@ public class MessageController {
                 .body(new ApiResponse<>(messageService.markAsRead(markReadRequest)));
     }
 
-
+    @GetMapping("/history")
+    public ResponseEntity<ApiResponse<List<MessageResponse>>> getHistoryMessages(
+            @RequestParam Long roomId,
+            @RequestParam(required = false) Long beforeId,
+            @RequestParam(defaultValue = "20") Integer size
+    ) {
+        var data = messageService.getHistoryMessages(roomId, beforeId, size);
+        
+        return ResponseEntity
+                .ok(new ApiResponse<>(data));
+    }
 }

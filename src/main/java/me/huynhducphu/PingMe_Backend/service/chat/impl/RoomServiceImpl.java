@@ -145,6 +145,8 @@ public class RoomServiceImpl implements me.huynhducphu.PingMe_Backend.service.ch
                 .stream()
                 .map(rp -> new RoomParticipantResponse(
                         rp.getUser().getId(),
+                        rp.getUser().getName(),
+                        rp.getUser().getAvatarUrl(),
                         rp.getRole(),
                         rp.getLastReadMessageId(),
                         rp.getLastReadAt()
@@ -153,8 +155,8 @@ public class RoomServiceImpl implements me.huynhducphu.PingMe_Backend.service.ch
 
         Long currentUserLastReadIdMessage = members.stream()
                 .filter(rp -> rp.getUser().getId().equals(userId))
-                .map(RoomParticipant::getLastReadMessageId)
                 .findFirst()
+                .map(RoomParticipant::getLastReadMessageId)
                 .orElse(null);
 
         long unread = 0;

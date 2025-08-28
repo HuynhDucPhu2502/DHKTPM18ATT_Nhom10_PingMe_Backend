@@ -1,5 +1,6 @@
 package me.huynhducphu.PingMe_Backend.dto.request.chat.message;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -21,7 +22,7 @@ public class SendMessageRequest {
     @NotBlank(message = "UUID không được để trống")
     private String clientMsgId;
 
-    @NotBlank(message = "Loại tin nhắn không được để trống")
+    @Schema(allowableValues = {"TEXT", "IMAGE", "VIDEO", "FILE"})
     private MessageType type;
 
     @NotNull(message = "Mã phòng không được để trống")
