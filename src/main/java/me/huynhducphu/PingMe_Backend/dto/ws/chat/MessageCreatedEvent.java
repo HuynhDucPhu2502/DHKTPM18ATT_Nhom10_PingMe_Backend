@@ -16,11 +16,9 @@ import java.util.List;
 public class MessageCreatedEvent {
 
     private ChatEventType chatEventType = ChatEventType.MESSAGE_CREATED;
-    private Long roomId;
     private MessageResponse messageResponse;
 
-    public MessageCreatedEvent(Long roomId, MessageResponse messageResponse) {
-        this.roomId = roomId;
+    public MessageCreatedEvent(MessageResponse messageResponse) {
         this.messageResponse = messageResponse;
     }
 }

@@ -15,12 +15,10 @@ public class RoomUpdatedEvent {
 
     private ChatEventType chatEventType = ChatEventType.ROOM_UPDATED;
     private Long userId;
-    private Long roomId;
     private RoomResponse roomResponse;
 
-    public RoomUpdatedEvent(Long userId, RoomResponse roomResponse, Long roomId) {
+    public RoomUpdatedEvent(Long userId, RoomResponse roomResponse) {
         this.userId = userId;
         this.roomResponse = roomResponse;
-        this.roomId = roomId;
     }
 }
