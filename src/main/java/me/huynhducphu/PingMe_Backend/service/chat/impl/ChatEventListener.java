@@ -1,9 +1,11 @@
 package me.huynhducphu.PingMe_Backend.service.chat.impl;
 
 import lombok.RequiredArgsConstructor;
-import me.huynhducphu.PingMe_Backend.dto.response.chat.room.RoomParticipantResponse;
-import me.huynhducphu.PingMe_Backend.dto.ws.chat.MessageCreatedEvent;
-import me.huynhducphu.PingMe_Backend.dto.ws.chat.RoomUpdatedEvent;
+import me.huynhducphu.PingMe_Backend.dto.ws.chat.event.MessageCreatedEvent;
+import me.huynhducphu.PingMe_Backend.dto.ws.chat.event.RoomUpdatedEvent;
+import me.huynhducphu.PingMe_Backend.dto.ws.chat.payload.MessageCreatedEventPayload;
+import me.huynhducphu.PingMe_Backend.dto.ws.chat.payload.RoomUpdatedEventPayload;
+import me.huynhducphu.PingMe_Backend.service.chat.util.ChatDtoUtils;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
@@ -20,29 +22,38 @@ import java.util.List;
 public class ChatEventListener {
 
     private final SimpMessagingTemplate messagingTemplate;
+    private final ChatDtoUtils chatDtoUtils;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onMessageCreated(MessageCreatedEvent event) {
-        long roomId = event.getMessageResponse().getRoomId();
-        String destination = "/topic/rooms/" + roomId + "/messages";
+        var messageResponse = chatDtoUtils.toMessageResponseDto(event.getMessage());
+        long roomId = messageResponse.getRoomId();
 
-        messagingTemplate.convertAndSend(destination, event);
+        String destination = "/topic/rooms/" + roomId + "/messages";
+        var payload = new MessageCreatedEventPayload(messageResponse);
+        
+        messagingTemplate.convertAndSend(destination, payload);
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onRoomUpdated(RoomUpdatedEvent event) {
         List<Long> participantIds = event
-                .getRoomResponse()
-                .getParticipants()
+                .getRoomParticipants()
                 .stream()
-                .map(RoomParticipantResponse::getUserId)
+                .map(x -> x.getUser().getId())
                 .toList();
 
         for (Long userId : participantIds) {
+            var payload = new RoomUpdatedEventPayload(chatDtoUtils.toRoomResponseDto(
+                    event.getRoom(),
+                    event.getRoomParticipants(),
+                    userId
+            ));
+
             messagingTemplate.convertAndSendToUser(
                     userId.toString(),
                     "/queue/rooms",
-                    event
+                    payload
             );
         }
     }

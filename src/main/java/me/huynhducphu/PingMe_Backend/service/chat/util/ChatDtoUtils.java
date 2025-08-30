@@ -29,8 +29,12 @@ public class ChatDtoUtils {
         );
     }
 
-    public RoomResponse toRoomResponseDto(Room room, List<RoomParticipant> members, Long userId) {
-        List<RoomParticipantResponse> roomParticipantResponses = members
+    public RoomResponse toRoomResponseDto(
+            Room room,
+            List<RoomParticipant> roomParticipants,
+            Long userId
+    ) {
+        List<RoomParticipantResponse> roomParticipantResponses = roomParticipants
                 .stream()
                 .map(rp -> new RoomParticipantResponse(
                         rp.getUser().getId(),
@@ -42,7 +46,7 @@ public class ChatDtoUtils {
                 ))
                 .toList();
 
-        Long currentUserLastReadIdMessage = members.stream()
+        Long currentUserLastReadIdMessage = roomParticipants.stream()
                 .filter(rp -> rp.getUser().getId().equals(userId))
                 .findFirst()
                 .map(RoomParticipant::getLastReadMessageId)

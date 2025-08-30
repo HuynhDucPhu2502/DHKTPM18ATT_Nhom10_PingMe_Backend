@@ -6,8 +6,8 @@ import me.huynhducphu.PingMe_Backend.dto.request.chat.message.MarkReadRequest;
 import me.huynhducphu.PingMe_Backend.dto.response.chat.message.ReadStateResponse;
 import me.huynhducphu.PingMe_Backend.dto.request.chat.message.SendMessageRequest;
 import me.huynhducphu.PingMe_Backend.dto.response.chat.message.MessageResponse;
-import me.huynhducphu.PingMe_Backend.dto.ws.chat.MessageCreatedEvent;
-import me.huynhducphu.PingMe_Backend.dto.ws.chat.RoomUpdatedEvent;
+import me.huynhducphu.PingMe_Backend.dto.ws.chat.event.MessageCreatedEvent;
+import me.huynhducphu.PingMe_Backend.dto.ws.chat.event.RoomUpdatedEvent;
 import me.huynhducphu.PingMe_Backend.model.Message;
 import me.huynhducphu.PingMe_Backend.model.Room;
 import me.huynhducphu.PingMe_Backend.model.RoomParticipant;
@@ -94,21 +94,21 @@ public class MessageServiceImpl implements me.huynhducphu.PingMe_Backend.service
         if (existed != null) return chatDtoUtils.toMessageResponseDto(existed);
 
         // Nếu chưa tồn tại, tạo tin nhắn mới
-        Message msg = new Message();
-        msg.setRoom(room);
-        msg.setSender(userRepository.getReferenceById(senderId));
-        msg.setContent(sendMessageRequest.getContent());
-        msg.setType(sendMessageRequest.getType());
-        msg.setClientMsgId(clientMsgId);
-        msg.setCreatedAt(LocalDateTime.now());
+        Message message = new Message();
+        message.setRoom(room);
+        message.setSender(userRepository.getReferenceById(senderId));
+        message.setContent(sendMessageRequest.getContent());
+        message.setType(sendMessageRequest.getType());
+        message.setClientMsgId(clientMsgId);
+        message.setCreatedAt(LocalDateTime.now());
 
         // Lưu tin nhắn vào cơ sở dữ liệu
         // Thực hiện Try Catch để tránh Race Condition
         // cho trường hợp User dùng 2 máy gửi tin nhắn cùng lúc
         try {
-            msg = messageRepository.save(msg);
+            message = messageRepository.save(message);
         } catch (DataIntegrityViolationException ex) {
-            msg = messageRepository
+            message = messageRepository
                     .findByRoom_IdAndSender_IdAndClientMsgId(roomId, senderId, clientMsgId)
                     .orElseThrow(() -> ex);
         }
@@ -117,8 +117,8 @@ public class MessageServiceImpl implements me.huynhducphu.PingMe_Backend.service
         // Thông tin cập nhật bao gồm:
         // + Tin nhắn cuối cùng
         // + Thời gian nhắn tin nhắn cuối cùng
-        room.setLastMessage(msg);
-        room.setLastMessageAt(msg.getCreatedAt());
+        room.setLastMessage(message);
+        room.setLastMessageAt(message.getCreatedAt());
         var savedRoom = roomRepository.save(room);
 
         // Cập nhật trạng thái của người dùng tham gia phòng (người dùng hiện tại)
@@ -129,24 +129,24 @@ public class MessageServiceImpl implements me.huynhducphu.PingMe_Backend.service
         // Dễ hiểu: người dùng A chat tin nhắn đó, thì mặc
         // định người dùng A đọc tất cả tin nhắn từ đầu đến tin nhắn
         // hiện tại của người dùng A
-        Message finalMsg = msg;
-        roomParticipantRepository.findById(roomMemberId).ifPresent(rp -> {
-            rp.setLastReadMessageId(finalMsg.getId());
-            rp.setLastReadAt(finalMsg.getCreatedAt());
-        });
+        Message finalMsg = message;
+        roomParticipantRepository
+                .findById(roomMemberId)
+                .ifPresent(rp -> {
+                    rp.setLastReadMessageId(finalMsg.getId());
+                    rp.setLastReadAt(finalMsg.getCreatedAt());
+                });
 
         // ===================================================================================================
-        // Tạo sự kiện kèm dữ liệu (WSPayload) để bắn Websocket
+        // WEBSOCKET
 
         // Sự kiện MESSAGE_CREATED (tạo tin nhắn mới)
-        var messageCreateEventPayload = chatDtoUtils.toMessageResponseDto(msg); // Dữ liệu
-        var messageCreatedEvent = new MessageCreatedEvent(messageCreateEventPayload); // Event (chứa dữ liệu)
+        var messageCreatedEvent = new MessageCreatedEvent(message);
 
         // Sử kiện ROOM_UPDATED (thông báo phòng có tin nhắn mới)
-        List<RoomParticipant> roomParticipants = roomParticipantRepository.findByRoom_Id(savedRoom.getId());
         var roomUpdatedEvent = new RoomUpdatedEvent(
-                senderId,
-                chatDtoUtils.toRoomResponseDto(savedRoom, roomParticipants, senderId)
+                savedRoom, // Dữ liệu mới nhất của phòng
+                roomParticipantRepository.findByRoom_Id(savedRoom.getId()) // Người trong phòng chat
         );
 
         // Bắn sự kiện Websocket
@@ -154,9 +154,8 @@ public class MessageServiceImpl implements me.huynhducphu.PingMe_Backend.service
         eventPublisher.publishEvent(roomUpdatedEvent);
         // ===================================================================================================
 
-        // Dữ liệu trả về cho người gửi tin nhắn (sender)
-        // Giống dữ liệu bắn cho các client khác
-        return messageCreateEventPayload;
+        // Trả dữ liệu về cho người gửi tin nhắn
+        return chatDtoUtils.toMessageResponseDto(message);
     }
 
     @Override
