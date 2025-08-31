@@ -54,7 +54,7 @@ public class MessageServiceImpl implements me.huynhducphu.PingMe_Backend.service
 
     @Override
     public MessageResponse sendMessage(SendMessageRequest sendMessageRequest) {
-        // Lấy người dùng gửi tin nhắn
+        // Lấy thộng tin người dùng hiện tại
         var currentUser = currentUserProvider.get();
 
         // Trích xuất ra thông tin người gửi
