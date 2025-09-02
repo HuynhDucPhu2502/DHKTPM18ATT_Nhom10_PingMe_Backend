@@ -4,8 +4,10 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import me.huynhducphu.PingMe_Backend.dto.request.friendship.FriendInvitationRequest;
 import me.huynhducphu.PingMe_Backend.dto.response.common.UserSummaryResponse;
+import me.huynhducphu.PingMe_Backend.dto.response.friendship.HistoryFriendshipResponse;
 import me.huynhducphu.PingMe_Backend.dto.ws.friendship.event.FriendshipEvent;
 import me.huynhducphu.PingMe_Backend.dto.ws.friendship.FriendshipEventType;
+import me.huynhducphu.PingMe_Backend.model.User;
 import me.huynhducphu.PingMe_Backend.model.constant.FriendshipStatus;
 import me.huynhducphu.PingMe_Backend.model.Friendship;
 import me.huynhducphu.PingMe_Backend.repository.FriendshipRepository;
@@ -15,9 +17,12 @@ import org.modelmapper.ModelMapper;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * Admin 8/19/2025
@@ -76,7 +81,7 @@ public class FriendshipServiceImpl implements me.huynhducphu.PingMe_Backend.serv
         // Bắn Event Websocket
         eventPublisher.publishEvent(new FriendshipEvent(
                 FriendshipEventType.INVITED,
-                friendship.getId(),
+                friendship,
                 friendship.getUserB().getId()
         ));
     }
@@ -105,7 +110,7 @@ public class FriendshipServiceImpl implements me.huynhducphu.PingMe_Backend.serv
         // Bắn Event Websocket
         eventPublisher.publishEvent(new FriendshipEvent(
                 FriendshipEventType.ACCEPTED,
-                friendship.getId(),
+                friendship,
                 friendship.getUserA().getId()
         ));
     }
@@ -135,7 +140,7 @@ public class FriendshipServiceImpl implements me.huynhducphu.PingMe_Backend.serv
         // Bắn Event Websocket
         eventPublisher.publishEvent(new FriendshipEvent(
                 FriendshipEventType.REJECTED,
-                friendship.getId(),
+                friendship,
                 friendship.getUserA().getId()
         ));
     }
@@ -165,7 +170,7 @@ public class FriendshipServiceImpl implements me.huynhducphu.PingMe_Backend.serv
         // Bắn Event Websocket
         eventPublisher.publishEvent(new FriendshipEvent(
                 FriendshipEventType.CANCELED,
-                friendship.getId(),
+                friendship,
                 friendship.getUserB().getId()
         ));
     }
@@ -197,67 +202,117 @@ public class FriendshipServiceImpl implements me.huynhducphu.PingMe_Backend.serv
         var isUserA = friendship.getUserA().getId().equals(currentUser.getId());
         eventPublisher.publishEvent(new FriendshipEvent(
                 FriendshipEventType.DELETED,
-                friendship.getId(),
+                friendship,
                 isUserA ? friendship.getUserB().getId() : friendship.getUserA().getId()
         ));
     }
 
     @Override
-    public Page<UserSummaryResponse> getAcceptedFriendshipList(Pageable pageable) {
+    public HistoryFriendshipResponse getAcceptedFriendshipHistoryList(
+            Long beforeId,
+            Integer size
+    ) {
+        if (size == null)
+            throw new IllegalArgumentException("Số lượng không hợp lệ");
+
         // Lấy thông tin người dùng hiện tại
         var currentUser = currentUserProvider.get();
 
-        return friendshipRepository
-                .findAllByFriendshipStatusAndUserA_IdOrFriendshipStatusAndUserB_Id(
+        int fixedSize = Math.max(1, Math.min(size, 20));
+        Pageable limit = PageRequest.of(0, fixedSize);
+
+        Page<Friendship> page = friendshipRepository
+                .findAllByStatusAndUserWithBeforeId(
                         FriendshipStatus.ACCEPTED, currentUser.getId(),
-                        FriendshipStatus.ACCEPTED, currentUser.getId(),
-                        pageable
-                )
+                        beforeId, limit
+                );
+
+        List<UserSummaryResponse> userSummaryResponses = page
+                .getContent()
+                .stream()
                 .map(friendship -> {
-                    var friend = friendship.getUserA().getId().equals(currentUser.getId())
+                    var user = friendship.getUserA().getId().equals(currentUser.getId())
                             ? friendship.getUserB()
                             : friendship.getUserA();
-                    var userSummaryResponse = modelMapper.map(friend, UserSummaryResponse.class);
-                    var friendshipSummary = modelMapper.map(friendship, UserSummaryResponse.FriendshipSummary.class);
-                    userSummaryResponse.setFriendshipSummary(friendshipSummary);
-                    return modelMapper.map(userSummaryResponse, UserSummaryResponse.class);
-                });
+                    return mapToDto(user, friendship);
+                })
+                .toList();
+
+        return new HistoryFriendshipResponse(userSummaryResponses, page.getTotalElements());
     }
 
     @Override
-    public Page<UserSummaryResponse> getReceivedInvitations(Pageable pageable) {
+    public HistoryFriendshipResponse getReceivedHistoryInvitations(
+            Long beforeId,
+            Integer size
+    ) {
+        if (size == null)
+            throw new IllegalArgumentException("Số lượng không hợp lệ");
+
         // Lấy thông tin người dùng hiện tại
         var currentUser = currentUserProvider.get();
 
-        return friendshipRepository
-                .findByFriendshipStatusAndUserB_Id(
-                        FriendshipStatus.PENDING, currentUser.getId(), pageable
-                )
+        int fixedSize = Math.max(1, Math.min(size, 20));
+        Pageable limit = PageRequest.of(0, fixedSize);
+
+        Page<Friendship> page = friendshipRepository
+                .findByStatusAndUserB_IdWithBeforeId(
+                        FriendshipStatus.PENDING, currentUser.getId(),
+                        beforeId, limit
+                );
+
+        List<UserSummaryResponse> userSummaryResponses = page
+                .getContent()
+                .stream()
                 .map(friendship -> {
                     var invitee = friendship.getUserA();
-                    var userSummaryResponse = modelMapper.map(invitee, UserSummaryResponse.class);
-                    var friendshipSummary = modelMapper.map(friendship, UserSummaryResponse.FriendshipSummary.class);
-                    userSummaryResponse.setFriendshipSummary(friendshipSummary);
-                    return userSummaryResponse;
-                });
+                    return mapToDto(invitee, friendship);
+                })
+                .toList();
+
+        return new HistoryFriendshipResponse(userSummaryResponses, page.getTotalElements());
     }
 
     @Override
-    public Page<UserSummaryResponse> getSentInvitations(Pageable pageable) {
+    public HistoryFriendshipResponse getSentHistoryInvitations(
+            Long beforeId,
+            Integer size
+    ) {
+        if (size == null)
+            throw new IllegalArgumentException("Số lượng không hợp lệ");
+
         // Lấy thông tin người dùng hiện tại
         var currentUser = currentUserProvider.get();
 
-        return friendshipRepository
-                .findByFriendshipStatusAndUserA_Id(
-                        FriendshipStatus.PENDING, currentUser.getId(), pageable
-                )
+        int fixedSize = Math.max(1, Math.min(size, 20));
+        Pageable limit = PageRequest.of(0, fixedSize);
+
+        Page<Friendship> page = friendshipRepository
+                .findByStatusAndUserA_IdWithBeforeId(
+                        FriendshipStatus.PENDING, currentUser.getId(),
+                        beforeId, limit
+                );
+        List<UserSummaryResponse> userSummaryResponses = page
+                .getContent()
+                .stream()
                 .map(friendship -> {
                     var invitee = friendship.getUserB();
-                    var userSummaryResponse = modelMapper.map(invitee, UserSummaryResponse.class);
-                    var friendshipSummary = modelMapper.map(friendship, UserSummaryResponse.FriendshipSummary.class);
-                    userSummaryResponse.setFriendshipSummary(friendshipSummary);
-                    return userSummaryResponse;
-                });
+                    return mapToDto(invitee, friendship);
+                })
+                .toList();
+
+        return new HistoryFriendshipResponse(userSummaryResponses, page.getTotalElements());
+    }
+
+    // =====================================
+    // Utilities methods
+    // =====================================
+    private UserSummaryResponse mapToDto(User user, Friendship friendship) {
+        var userSummaryResponse = modelMapper.map(user, UserSummaryResponse.class);
+        var friendshipSummary = modelMapper.map(friendship, UserSummaryResponse.FriendshipSummary.class);
+        userSummaryResponse.setFriendshipSummary(friendshipSummary);
+
+        return userSummaryResponse;
     }
 
 
