@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import me.huynhducphu.PingMe_Backend.model.common.BaseEntity;
 import me.huynhducphu.PingMe_Backend.model.constant.BlogCategory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,6 +30,10 @@ public class Blog extends BaseEntity {
 
     private String title;
 
+    private String imgPreviewUrl;
+
+    private String description;
+
     @Column(columnDefinition = "TEXT")
     private String content;
 
@@ -42,4 +47,15 @@ public class Blog extends BaseEntity {
     @OneToMany(mappedBy = "blog")
     private List<Comment> comments;
 
+    @Column(nullable = false)
+    private Boolean isApproved = false;
+
+    public Blog(String title, String description, String content, BlogCategory category) {
+        this.title = title;
+        this.description = description;
+        this.content = content;
+        this.category = category;
+        this.isApproved = true;
+        this.comments = new ArrayList<>();
+    }
 }

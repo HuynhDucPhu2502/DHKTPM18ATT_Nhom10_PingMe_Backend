@@ -19,9 +19,14 @@ public class CreateBlogRequest {
     @NotBlank(message = "Tiêu đề Blog không được bỏ trống")
     private String title;
 
+    @NotBlank(message = "Mô tả Blog không được để trống")
+    private String description;
+
     @NotBlank(message = "Nội dung Blog không được bỏ trống")
     private String content;
 
     @NotNull(message = "Chủ đề Blog không được bỏ trống")
     private BlogCategory category;
+
+
 }
