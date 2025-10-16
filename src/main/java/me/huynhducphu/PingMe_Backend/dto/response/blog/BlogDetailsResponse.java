@@ -7,13 +7,13 @@ import me.huynhducphu.PingMe_Backend.dto.response.common.UserSummaryResponse;
 import me.huynhducphu.PingMe_Backend.model.constant.BlogCategory;
 
 /**
- * Admin 10/13/2025
+ * Admin 10/14/2025
  *
  **/
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class BlogReviewResponse {
+public class BlogDetailsResponse {
 
     private Long id;
     private String title;
@@ -22,5 +22,6 @@ public class BlogReviewResponse {
     private UserSummaryResponse user;
     private String imgPreviewUrl;
     private Boolean isApproved;
+    private String content;
 
 }

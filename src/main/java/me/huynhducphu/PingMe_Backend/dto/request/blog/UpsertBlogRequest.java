@@ -14,7 +14,7 @@ import me.huynhducphu.PingMe_Backend.model.constant.BlogCategory;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class CreateBlogRequest {
+public class UpsertBlogRequest {
 
     @NotBlank(message = "Tiêu đề Blog không được bỏ trống")
     private String title;

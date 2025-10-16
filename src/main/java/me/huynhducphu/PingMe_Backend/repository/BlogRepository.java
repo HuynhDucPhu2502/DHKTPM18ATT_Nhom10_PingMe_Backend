@@ -13,8 +13,6 @@ import java.util.List;
  * Admin 9/15/2025
  *
  **/
-// Class bth muốn kế thừa interface thì phải impl
-// Class interface muốn kế thừa interface thì dùng extends
 public interface BlogRepository extends
         JpaRepository<Blog, Long>,
         JpaSpecificationExecutor<Blog> {
@@ -32,5 +30,16 @@ public interface BlogRepository extends
         return findAll(combinedSpec, pageable);
 
     }
-    
+
+    default Page<Blog> findByUserId(Long userId, Specification<Blog> filterSpec, Pageable pageable) {
+        Specification<Blog> userSpec = (root, query, cb) ->
+                cb.equal(root.get("user").get("id"), userId);
+
+        Specification<Blog> combinedSpec =
+                (filterSpec != null) ? userSpec.and(filterSpec) : userSpec;
+
+        return findAll(combinedSpec, pageable);
+    }
+
+
 }

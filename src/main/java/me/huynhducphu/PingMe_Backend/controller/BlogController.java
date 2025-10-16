@@ -4,9 +4,10 @@ import com.turkraft.springfilter.boot.Filter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import me.huynhducphu.PingMe_Backend.dto.request.blog.CreateBlogRequest;
+import me.huynhducphu.PingMe_Backend.dto.request.blog.UpsertBlogRequest;
 import me.huynhducphu.PingMe_Backend.dto.response.ApiResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.PageResponse;
+import me.huynhducphu.PingMe_Backend.dto.response.blog.BlogDetailsResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.blog.BlogReviewResponse;
 import me.huynhducphu.PingMe_Backend.model.Blog;
 import me.huynhducphu.PingMe_Backend.service.blog.BlogService;
@@ -35,12 +36,23 @@ public class BlogController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<BlogReviewResponse>> saveBlog(
-            @Valid @RequestPart("blog") CreateBlogRequest createBlogRequest,
+            @Valid @RequestPart("blog") UpsertBlogRequest upsertBlogRequest,
             @RequestPart(value = "blogImage", required = false) MultipartFile blogImg
     ) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(new ApiResponse<>(blogService.saveBlog(createBlogRequest, blogImg)));
+                .body(new ApiResponse<>(blogService.saveBlog(upsertBlogRequest, blogImg)));
+    }
+
+    @PutMapping("/{blogId}")
+    public ResponseEntity<ApiResponse<BlogReviewResponse>> updateBlog(
+            @PathVariable Long blogId,
+            @Valid @RequestPart("blog") UpsertBlogRequest upsertBlogRequest,
+            @RequestPart(value = "blogImage", required = false) MultipartFile blogImg
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ApiResponse<>(blogService.updateBlog(upsertBlogRequest, blogImg, blogId)));
     }
 
     @GetMapping("/approved")
@@ -54,6 +66,26 @@ public class BlogController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new ApiResponse<>(res));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<PageResponse<BlogReviewResponse>>> getCurrentUserBlogs(
+            @Filter Specification<Blog> spec,
+            @PageableDefault() Pageable pageable
+    ) {
+        var page = blogService.getCurrentUserBlogs(spec, pageable);
+        var res = new PageResponse<>(page);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ApiResponse<>(res));
+    }
+
+    @GetMapping("/details/{id}")
+    public ResponseEntity<ApiResponse<BlogDetailsResponse>> getBlogDetailsById(@PathVariable Long id) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ApiResponse<>(blogService.getBlogDetailsById(id)));
     }
 
 
