@@ -22,6 +22,7 @@ import me.huynhducphu.PingMe_Backend.repository.music.SongPlayHistoryRepository;
 import me.huynhducphu.PingMe_Backend.repository.music.SongRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -56,13 +57,12 @@ public class SongServiceImpl implements SongService {
     private final S3Service s3Service;
     private final CurrentUserProvider currentUserProvider;
 
-    @Override // Nhớ thêm Override nếu hàm này có trong interface
-    public List<SongResponseWithAllAlbum> getAllSongs() {
-        // Cách viết hiện đại dùng Stream
-        return songRepository.findAll().stream()
-                .map(this::mapToSongResponseWithAllAlbums) // Gọi hàm map ở dưới
-                .collect(Collectors.toList());
+    @Override
+    public Page<SongResponseWithAllAlbum> getAllSongs(Pageable pageable) {
+        return songRepository.findAllActive(pageable)
+                .map(this::mapToSongResponseWithAllAlbums);
     }
+
 
 
     @Override
@@ -75,63 +75,47 @@ public class SongServiceImpl implements SongService {
                 : null);
     }
 
-    @Override
-    public List<SongResponse> getSongByTitle(String title) {
-        //Lấy danh sách bài hát từ DB theo title (case-insensitive)
-        List<Song> songs = songRepository.findSongsByTitleContainingIgnoreCase(title);
 
-        return flattenSongsWithAlbums(songs);
+    @Override
+    public Page<SongResponse> getSongByTitle(String title, Pageable pageable) {
+        return songRepository
+                .findByTitleContainingIgnoreCaseAndIsDeletedFalse(title, pageable)
+                .map(song ->
+                        mapToSongResponse(
+                                song,
+                                song.getAlbums().stream().findFirst().orElse(null)
+                        )
+                );
     }
 
     @Override
-    public List<SongResponseWithAllAlbum> getSongByGenre(Long id) { // Hoặc nhận thẳng Long genreId
-        if (id == null) {
+    public Page<SongResponseWithAllAlbum> getSongByGenre(Long genreId, Pageable pageable) {
+        if (genreId == null) {
             throw new RuntimeException("Genre ID không được trống");
         }
-
-        // Gọi hàm vừa viết - Chỉ tốn đúng 1 query
-        List<Song> songs = songRepository.findSongsByGenreId(id);
-
-        return songs.stream()
-                .map(this::mapToSongResponseWithAllAlbums) // Gọi hàm map ở dưới
-                .collect(Collectors.toList());
+        return songRepository.findByGenreId(genreId, pageable)
+                .map(this::mapToSongResponseWithAllAlbums);
     }
 
+
     @Override
-    public List<SongResponseWithAllAlbum> getSongByAlbum(Long id) {
-        if (id == null) {
+    public Page<SongResponseWithAllAlbum> getSongByAlbum(Long albumId, Pageable pageable) {
+        if (albumId == null) {
             throw new RuntimeException("Album ID không được trống");
         }
-
-        // Tìm Album theo ID
-        Album album = albumRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy Album với ID: " + id));
-
-        // Lấy danh sách bài hát từ Album
-        Set<Song> songs = album.getSongs();
-
-        return songs.stream()
-                .map(this::mapToSongResponseWithAllAlbums) // Gọi hàm map ở dưới
-                .collect(Collectors.toList());
-
+        return songRepository.findByAlbumId(albumId, pageable)
+                .map(this::mapToSongResponseWithAllAlbums);
     }
 
     @Override
-    public List<SongResponseWithAllAlbum> getSongsByArtist(Long artistId) {
+    public Page<SongResponseWithAllAlbum> getSongsByArtist(Long artistId, Pageable pageable) {
         if (artistId == null) {
             throw new RuntimeException("Artist ID không được trống");
         }
-
-        // Lấy danh sách bài hát từ Artist thông qua SongArtistRole
-        List<SongArtistRole> artistRoles = songArtistRoleRepository.findSongArtistRolesByArtist_Id(artistId);
-        Set<Song> songs = artistRoles.stream()
-                .map(SongArtistRole::getSong)
-                .collect(Collectors.toSet());
-
-        return songs.stream()
-                .map(this::mapToSongResponseWithAllAlbums) // Gọi hàm map ở dưới
-                .collect(Collectors.toList());
+        return songRepository.findByArtistId(artistId, pageable)
+                .map(this::mapToSongResponseWithAllAlbums);
     }
+
 
     // Cho phép truyền số lượng bài muốn lấy
     public List<SongResponseWithAllAlbum> getTopPlayedSongs(int limit) {
@@ -538,7 +522,7 @@ public class SongServiceImpl implements SongService {
         if (Boolean.TRUE.equals(alreadyPlayed)) return;
 
         // Tăng playCount
-        songRepository.incrementPlayCount(songId, userId);
+        songRepository.incrementPlayCount(songId);
 
         // Lấy song để log lịch sử
         Song song = songRepository.findById(songId)

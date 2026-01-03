@@ -13,6 +13,9 @@ import me.huynhducphu.PingMe_Backend.dto.request.music.SongRequest;
 import me.huynhducphu.PingMe_Backend.dto.response.music.SongResponse;
 import me.huynhducphu.PingMe_Backend.dto.response.music.SongResponseWithAllAlbum;
 import me.huynhducphu.PingMe_Backend.service.music.SongService;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,59 +52,47 @@ public class SongController {
     }
 
     // ========================= GET ALL =========================
-    @Operation(
-            summary = "Lấy danh sách tất cả bài hát",
-            description = "Trả về danh sách bài hát kèm album, artist, genre"
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Lấy danh sách thành công")
-    })
+    @Operation(summary = "Lấy danh sách bài hát (phân trang)")
     @GetMapping("/all")
-    public ResponseEntity<List<SongResponseWithAllAlbum>> getAllSongs() {
-        return ResponseEntity.ok(songService.getAllSongs());
+    public ResponseEntity<Page<SongResponseWithAllAlbum>> getAllSongs(
+            @ParameterObject Pageable pageable
+    ) {
+        return ResponseEntity.ok(songService.getAllSongs(pageable));
     }
+
 
     // ========================= SEARCH BY TITLE =========================
-    @Operation(
-            summary = "Tìm bài hát theo tên",
-            description = "Tìm kiếm bài hát gần đúng theo tiêu đề"
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Tìm kiếm thành công")
-    })
+    @Operation(summary = "Tìm bài hát theo tên (phân trang)")
     @GetMapping("/search")
-    public ResponseEntity<List<SongResponse>> getSongByTitle(
-            @Parameter(description = "Tên bài hát", example = "Love")
-            @RequestParam("title") String title
+    public ResponseEntity<Page<SongResponse>> searchByTitle(
+            @RequestParam String title,
+            @ParameterObject Pageable pageable
     ) {
-        return ResponseEntity.ok(songService.getSongByTitle(title));
+        return ResponseEntity.ok(songService.getSongByTitle(title, pageable));
     }
+
 
     // ========================= SEARCH BY ALBUM =========================
-    @Operation(
-            summary = "Lấy bài hát theo album",
-            description = "Trả về danh sách bài hát thuộc một album"
-    )
+    @Operation(summary = "Lấy bài hát theo album (phân trang)")
     @GetMapping("/search-by-album")
-    public ResponseEntity<List<SongResponseWithAllAlbum>> getSongByAlbum(
-            @Parameter(description = "ID album", example = "5")
-            @RequestParam("id") Long albumId
+    public ResponseEntity<Page<SongResponseWithAllAlbum>> getByAlbum(
+            @RequestParam("id") Long albumId,
+            @ParameterObject Pageable pageable
     ) {
-        return ResponseEntity.ok(songService.getSongByAlbum(albumId));
+        return ResponseEntity.ok(songService.getSongByAlbum(albumId, pageable));
     }
 
+
     // ========================= SEARCH BY ARTIST =========================
-    @Operation(
-            summary = "Lấy bài hát theo nghệ sĩ",
-            description = "Trả về tất cả bài hát của một nghệ sĩ"
-    )
+    @Operation(summary = "Lấy bài hát theo nghệ sĩ (phân trang)")
     @GetMapping("/search-by-artist")
-    public ResponseEntity<List<SongResponseWithAllAlbum>> getSongsByArtist(
-            @Parameter(description = "ID nghệ sĩ", example = "3")
-            @RequestParam("id") Long artistId
+    public ResponseEntity<Page<SongResponseWithAllAlbum>> getByArtist(
+            @RequestParam("id") Long artistId,
+            @ParameterObject Pageable pageable
     ) {
-        return ResponseEntity.ok(songService.getSongsByArtist(artistId));
+        return ResponseEntity.ok(songService.getSongsByArtist(artistId, pageable));
     }
+
 
     // ========================= TOP PLAYED =========================
     @Operation(
@@ -117,17 +108,15 @@ public class SongController {
     }
 
     // ========================= SEARCH BY GENRE =========================
-    @Operation(
-            summary = "Lấy bài hát theo thể loại",
-            description = "Trả về danh sách bài hát thuộc một genre"
-    )
+    @Operation(summary = "Lấy bài hát theo thể loại (phân trang)")
     @GetMapping("/genre")
-    public ResponseEntity<List<SongResponseWithAllAlbum>> getByGenre(
-            @Parameter(description = "ID thể loại", example = "2")
-            @RequestParam("id") Long genreId
+    public ResponseEntity<Page<SongResponseWithAllAlbum>> getByGenre(
+            @RequestParam("id") Long genreId,
+            @ParameterObject Pageable pageable
     ) {
-        return ResponseEntity.ok(songService.getSongByGenre(genreId));
+        return ResponseEntity.ok(songService.getSongByGenre(genreId, pageable));
     }
+
 
     // ========================= SAVE SONG =========================
     @Operation(
