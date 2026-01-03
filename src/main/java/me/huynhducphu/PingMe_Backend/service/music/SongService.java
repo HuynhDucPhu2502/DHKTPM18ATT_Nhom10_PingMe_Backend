@@ -5,6 +5,8 @@ import me.huynhducphu.PingMe_Backend.dto.response.music.SongResponse;
 
 import me.huynhducphu.PingMe_Backend.dto.response.music.SongResponseWithAllAlbum;
 import me.huynhducphu.PingMe_Backend.dto.response.music.misc.GenreDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -17,19 +19,19 @@ public interface SongService {
     long MAX_AUDIO_SIZE = 20 * 1024 * 1024;
     long MAX_COVER_SIZE = 5 * 1024 * 1024;
 
-    List<SongResponseWithAllAlbum> getAllSongs();
+    Page<SongResponseWithAllAlbum> getAllSongs(Pageable pageable);
 
     SongResponse getSongById(Long id);
 
-    List<SongResponse> getSongByTitle(String title);
+    Page<SongResponseWithAllAlbum> getSongByGenre(Long genreId, Pageable pageable);
 
-    List<SongResponseWithAllAlbum> getSongByAlbum(Long id);
+    Page<SongResponseWithAllAlbum> getSongByAlbum(Long albumId, Pageable pageable);
 
-    List<SongResponseWithAllAlbum> getSongsByArtist(Long artistId);
+    Page<SongResponseWithAllAlbum> getSongsByArtist(Long artistId, Pageable pageable);
 
     List<SongResponseWithAllAlbum> getTopPlayedSongs(int limit);
 
-    List<SongResponseWithAllAlbum> getSongByGenre(Long id);
+    Page<SongResponse> getSongByTitle(String title, Pageable pageable);
 
     List<SongResponse> save(
             SongRequest dto,
